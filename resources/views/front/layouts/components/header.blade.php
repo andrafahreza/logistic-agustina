@@ -15,7 +15,7 @@
                 <li><a href="{{ route('cek-harga') }}" class="@if ($title == 'cek harga') active @endif">Cek Harga</a></li>
                 <li><a href="{{ route('syarat') }}" class="@if ($title == 'syarat') active @endif">Syarat dan Ketentuan</a></li>
                 <li><a href="{{ route('kontak-kami') }}" class="@if ($title == 'kontak kami') active @endif">Kontak Kami</a></li>
-                <li><a class="get-a-quote" href="{{ route('kontak-kami') }}">Login</a></li>
+                <li><a class="get-a-quote" href="{{ route('login') }}">Login</a></li>
             </ul>
         </nav><!-- .navbar -->
 

@@ -17,10 +17,19 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table    = 'pengguna';
     protected $fillable = [
-        'name',
-        'email',
+        'level_id',
+        'pelanggan_id',
+        'vendor_id',
+        'username',
         'password',
+        'nama',
+        'jenis_kelamin',
+        'alamat',
+        'email',
+        'no_telepon',
+        'status',
     ];
 
     /**
@@ -30,7 +39,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -41,4 +49,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function level(){
+        return $this->belongsTo(Level::class, "level_id");
+    }
+
+    public function pelanggan(){
+        return $this->belongsTo(Pelanggan::class, "pelanggan_id");
+    }
+
+    public function vendor(){
+        return $this->belongsTo(Vendor::class, "vendor_id");
+    }
 }
