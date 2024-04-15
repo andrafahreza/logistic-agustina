@@ -4,7 +4,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
         <li class="nav-item">
-            <a class="nav-link " href="index.html">
+            <a class="nav-link @if ($title == 'home') active @else collapsed @endif" href="{{ route('home') }}">
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
             </a>
@@ -183,12 +183,19 @@
             </ul>
         </li><!-- End Icons Nav -->
 
-        <li class="nav-heading">Pages</li>
+        <li class="nav-heading">Master Data</li>
 
         <li class="nav-item">
             <a class="nav-link collapsed" href="users-profile.html">
                 <i class="bi bi-person"></i>
                 <span>Profile</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @if ($title === 'supir') active @else collapsed @endif" href="{{ route('supir') }}">
+                <i class="bi bi-person-badge"></i>
+                <span>Supir</span>
             </a>
         </li><!-- End Profile Page Nav -->
 
