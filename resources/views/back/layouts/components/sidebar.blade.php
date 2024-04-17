@@ -197,7 +197,14 @@
                 <i class="bi bi-person-badge"></i>
                 <span>Supir</span>
             </a>
-        </li><!-- End Profile Page Nav -->
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @if ($title === 'biaya') active @else collapsed @endif" href="{{ route('biaya') }}">
+                <i class="bi bi-cash"></i>
+                <span>Biaya</span>
+            </a>
+        </li>
 
         <li class="nav-item">
             <a class="nav-link collapsed" href="pages-faq.html">
