@@ -101,6 +101,10 @@ class VendorController extends Controller
                 if (!$data->update()) {
                     throw new \Exception("Gagal mengubah data");
                 }
+
+                if (!$data2->update()) {
+                    throw new \Exception("Gagal mengubah data 2");
+                }
             }
 
             DB::commit();

@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\SupirController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,31 @@ Route::middleware('auth')->group(function() {
             Route::get("simpan/{id?}", [BiayaController::class, 'data'])->name('data-biaya');
             Route::post("simpan/{id?}", [BiayaController::class, 'simpan'])->name('simpan-biaya');
             Route::post("hapus", [BiayaController::class, 'hapus'])->name('hapus-biaya');
+        });
+
+        Route::prefix("admin")->group(function() {
+            Route::get("/", [UserController::class, 'admin'])->name('admin');
+            Route::get("simpan/{id?}", [UserController::class, 'data_admin'])->name('data-admin');
+            Route::post("simpan/{id?}", [UserController::class, 'simpan_admin'])->name('simpan-admin');
+            Route::post("nonactive", [UserController::class, 'nonactive_admin'])->name('nonactive-admin');
+            Route::post("active", [UserController::class, 'active_admin'])->name('active-admin');
+            Route::post("hapus", [UserController::class, 'hapus_admin'])->name('hapus-admin');
+        });
+
+        Route::prefix("operator")->group(function() {
+            Route::get("/", [UserController::class, 'operator'])->name('operator');
+            Route::get("simpan/{id?}", [UserController::class, 'data_operator'])->name('data-operator');
+            Route::post("simpan/{id?}", [UserController::class, 'simpan_operator'])->name('simpan-operator');
+            Route::post("nonactive", [UserController::class, 'nonactive_operator'])->name('nonactive-operator');
+            Route::post("active", [UserController::class, 'active_operator'])->name('active-operator');
+            Route::post("hapus", [UserController::class, 'hapus_operator'])->name('hapus-operator');
+        });
+
+        Route::prefix("kepala")->group(function() {
+            Route::get("/", [UserController::class, 'kepala'])->name('kepala');
+            Route::get("simpan/{id?}", [UserController::class, 'data_kepala'])->name('data-kepala');
+            Route::post("simpan/{id?}", [UserController::class, 'simpan_kepala'])->name('simpan-kepala');
+            Route::post("hapus", [UserController::class, 'hapus_kepala'])->name('hapus-kepala');
         });
 
         Route::prefix("vendor")->group(function() {

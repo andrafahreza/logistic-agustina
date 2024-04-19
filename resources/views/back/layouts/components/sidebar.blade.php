@@ -186,10 +186,25 @@
         <li class="nav-heading">Master Data</li>
 
         <li class="nav-item">
-            <a class="nav-link @if ($title != 'vendor') collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
+            <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin") collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-person"></i><span>Pengguna</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor') show @endif" data-bs-parent="#sidebar-nav">
+            <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor' || $title == 'admin' || $title == 'kepala perusahaan' || $title == 'operator') show @endif" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{{ route('admin') }}" @if ($title == 'admin') class="active" @endif>
+                        <i class="bi bi-circle"></i><span>Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('operator') }}" @if ($title == 'operator') class="active" @endif>
+                        <i class="bi bi-circle"></i><span>Operator</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('kepala') }}" @if ($title == 'kepala perusahaan') class="active" @endif>
+                        <i class="bi bi-circle"></i><span>Kepala Perusahaan</span>
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('vendor') }}" @if ($title == 'vendor') class="active" @endif>
                         <i class="bi bi-circle"></i><span>Vendor</span>
