@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\VendorController;
@@ -48,6 +49,12 @@ Route::middleware('auth')->group(function() {
             Route::post("nonactive", [VendorController::class, 'nonactive'])->name('nonactive-vendor');
             Route::post("active", [VendorController::class, 'active'])->name('active-vendor');
             Route::post("hapus", [VendorController::class, 'hapus'])->name('hapus-vendor');
+
+            Route::prefix("kendaraan")->group(function() {
+                Route::get("list/{id?}", [KendaraanController::class, 'index'])->name('list-kendaraan');
+                Route::post("simpan", [KendaraanController::class, 'simpan'])->name('simpan-kendaraan');
+                Route::post("hapus", [KendaraanController::class, 'hapus'])->name('hapus-kendaraan');
+            });
         });
     });
 

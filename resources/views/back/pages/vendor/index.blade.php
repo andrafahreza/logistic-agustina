@@ -59,6 +59,7 @@
                                             @endif
                                         </td>
                                         <td>
+                                            <a class="btn btn-secondary" href="{{ route('list-kendaraan', ['id' => $item->id]) }}">List Kendaraan</a>
                                             <button type="button" class="btn btn-warning" onclick="edit({{ $item->id }})">Edit</button>
 
                                             @if ($item->user->status == "active")
