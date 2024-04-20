@@ -13,8 +13,43 @@
 
     <section class="section dashboard">
         <div class="row">
-            <div class="col-md-12">
-            </div>
+            @if ($user->level->nama_level == "admin" || $user->level->nama_level == "keuangan" || $user->level->nama_level == "kepala_perusahaan")
+                <div class="col-xxl-4 col-xl-12">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pelanggan </h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ number_format($pelanggan) }}</h6>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-4 col-xl-12">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pelanggan Belum Verifikasi</h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-person-check"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ number_format($nonActive) }}</h6>
+                                    <a href="{{ route('verifikasi') }}">Lihat Selengkapnya</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </section>
 @endsection

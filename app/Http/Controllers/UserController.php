@@ -11,6 +11,48 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function verifikasi()
+    {
+        $title = "verifikasi";
+        $level = Level::where('nama_level', 'pelanggan')->first();
+        if (empty($level)) {
+            abort(404);
+        }
+
+        $data = User::where('status', 'non_active')
+        ->where('level_id', $level->id)
+        ->latest()
+        ->get();
+
+        return view('back.pages.user.verifikasi', compact('title', 'data'));
+    }
+
+    public function verifikasi_pelanggan(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = User::find($request->id);
+            if (empty($data)) {
+                throw new \Exception("Pelanggan tidak ditemukan");
+            }
+
+            $data->status = "active";
+
+            if (!$data->update()) {
+                throw new \Exception("Gagal memverifikasi pelanggan, silahkan coba lagi");
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "Berhasil memverifikasi pelanggan");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    // Admin
     public function admin()
     {
         $title = "admin";

@@ -21,12 +21,17 @@ Route::get('/kontak', [PenggunaController::class, 'kontak'])->name('kontak-kami'
 Route::get('/kecamatan/{id?}', [WilayahController::class, 'kecamatan'])->name('get-kecamatan');
 Route::get('/kelurahan/{id?}', [WilayahController::class, 'kelurahan'])->name('get-kelurahan');
 
+Route::get('/pendaftaran', [AuthController::class, 'daftar'])->name('daftar')->middleware('guest');
+Route::post('/pendaftaran', [AuthController::class, 'daftarkan'])->name('daftarkan')->middleware('guest');
 Route::get('/login', [AuthController::class, 'login'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'auth'])->name('authenticate');
 
 Route::middleware('auth')->group(function() {
     Route::get("home", [HomeController::class, 'index'])->name('home');
     Route::get("logout", [AuthController::class, 'logout'])->name('logout');
+
+    Route::get("verifikasi", [UserController::class, 'verifikasi'])->name('verifikasi');
+    Route::post("verifikasi", [UserController::class, 'verifikasi_pelanggan'])->name('verifikasi-pelanggan');
 
     Route::prefix("master-data")->group(function() {
         Route::prefix("supir")->group(function() {
