@@ -6,8 +6,8 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item">Master Data</li>
-                <li class="breadcrumb-item active">Biaya</li>
+                <li class="breadcrumb-item">Pesanan</li>
+                <li class="breadcrumb-item active">Biaya Pengiriman</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->

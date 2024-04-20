@@ -10,7 +10,20 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-        @if (auth()->user()->level->nama_level == "admin")
+        <li class="nav-item">
+            <a class="nav-link @if ($title != 'request pengiriman') collapsed @endif" data-bs-target="#pengiriman" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-truck"></i><span>Pengiriman</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="pengiriman" class="nav-content collapse @if ($title == 'request pengiriman') show @endif" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{{ route('request-pengiriman') }}" @if ($title == 'request pengiriman') class="active" @endif>
+                        <i class="bi bi-circle"></i><span>Request Pengiriman Barang</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
             <li class="nav-item">
                 <a class="nav-link @if ($title === 'verifikasi') active @else collapsed @endif" href="{{ route('verifikasi') }}">
                     <i class="bi bi-person-check-fill"></i>
@@ -19,14 +32,12 @@
             </li>
         @endif
 
-        @if (auth()->user()->level->nama_level != "pelanggan")
-            <li class="nav-heading">Master Data</li>
-
+        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
             <li class="nav-item">
-                <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin") collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-person"></i><span>Pengguna</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin" || $title == 'users') collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-person"></i><span>Employeed</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor' || $title == 'admin' || $title == 'kepala perusahaan' || $title == 'operator') show @endif" data-bs-parent="#sidebar-nav">
+                <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor' || $title == 'admin' || $title == 'kepala perusahaan' || $title == 'operator' || $title == 'users') show @endif" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="{{ route('admin') }}" @if ($title == 'admin') class="active" @endif>
                             <i class="bi bi-circle"></i><span>Admin</span>
@@ -47,21 +58,31 @@
                             <i class="bi bi-circle"></i><span>Vendor</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('users') }}" @if ($title == 'users') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Users</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link @if ($title === 'supir') active @else collapsed @endif" href="{{ route('supir') }}">
-                    <i class="bi bi-person-badge"></i>
-                    <span>Supir</span>
+                <a class="nav-link @if ($title != 'biaya' && $title != 'kendaraan' && $title != 'supir') collapsed @endif" data-bs-target="#pesanan" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-archive-fill"></i><span>Pesanan</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link @if ($title === 'biaya') active @else collapsed @endif" href="{{ route('biaya') }}">
-                    <i class="bi bi-cash"></i>
-                    <span>Biaya</span>
-                </a>
+                <ul id="pesanan" class="nav-content collapse @if ($title == 'biaya' || $title == 'kendaraan' || $title == 'supir') show @endif" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="{{ route('biaya') }}" @if ($title == 'biaya') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Biaya Pengiriman</span>
+                        </a>
+                        <a href="{{ route('kendaraan') }}" @if ($title == 'kendaraan') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Kendaraan</span>
+                        </a>
+                        <a href="{{ route('supir') }}" @if ($title == 'supir') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Supir</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
         @endif
 

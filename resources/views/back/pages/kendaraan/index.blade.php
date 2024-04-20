@@ -2,13 +2,12 @@
 
 @section('contents')
     <div class="pagetitle">
-        <h1>List Kendaraan</h1>
+        <h1>Kendaraan</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item">Employeed</li>
-                <li class="breadcrumb-item">Vendor</li>
-                <li class="breadcrumb-item active">List Kendaraan</li>
+                <li class="breadcrumb-item">Pesanan</li>
+                <li class="breadcrumb-item active">Kendaraan</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -72,7 +71,6 @@
             <div class="modal-content">
                 <form action="{{ route('simpan-kendaraan') }}" method="POST" id="formTambah">
                     @csrf
-                    <input type="hidden" name="vendor_id" value="{{ $id }}">
                     <div class="modal-header">
                         <h5 class="modal-title">Tambah Data</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -85,6 +83,15 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-12 mt-4">
+                                <label>Kode Vendor</label>
+                                <select class="form-control" name="vendor_id" required>
+                                    <option value="">Pilih Vendor</option>
+                                    @foreach ($vendor as $item)
+                                        <option value="{{ $item->id }}">{{ $item->kode }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-12 mt-4">
                                 <label>No Kendaraan</label>
                                 <input type="text" class="form-control" id="no_kendaraan" name="no_kendaraan" required>

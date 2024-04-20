@@ -67,4 +67,13 @@ class KendaraanController extends Controller
             return redirect()->back()->withErrors($th->getMessage());
         }
     }
+
+    public function list_all()
+    {
+        $title = "kendaraan";
+        $data = Kendaraan::latest()->get();
+        $vendor = Vendor::get();
+
+        return view('back.pages.kendaraan.index', compact("title", "data", "vendor"));
+    }
 }

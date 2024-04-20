@@ -52,6 +52,64 @@ class UserController extends Controller
         }
     }
 
+    public function users()
+    {
+        $title = "users";
+        $level = Level::where('nama_level', 'pelanggan')->first();
+        if (empty($level)) {
+            abort(404);
+        }
+
+        $data = User::whereNot("id", Auth::user()->id)
+        ->where('level_id', $level->id)
+        ->latest()
+        ->get();
+
+        return view('back.pages.user.pelanggan', compact(['title', 'data']));
+    }
+
+    public function nonactive_user(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $pengguna = User::find($request->id);
+            $pengguna->status = "non_active";
+
+            if (!$pengguna->update()) {
+                throw new \Exception("Gagal menonaktifkan users");
+            }
+
+            DB::commit();
+
+            return redirect()->route('users')->with('success', "Berhasil menonaktifkan users");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function active_user(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $pengguna = User::find($request->id);
+            $pengguna->status = "active";
+
+            if (!$pengguna->update()) {
+                throw new \Exception("Gagal mengaktifkan user");
+            }
+
+            DB::commit();
+
+            return redirect()->route('users')->with('success', "Berhasil mengaktifkan user");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
     // Admin
     public function admin()
     {

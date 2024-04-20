@@ -5,6 +5,7 @@ use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
@@ -20,6 +21,7 @@ Route::get('/kontak', [PenggunaController::class, 'kontak'])->name('kontak-kami'
 
 Route::get('/kecamatan/{id?}', [WilayahController::class, 'kecamatan'])->name('get-kecamatan');
 Route::get('/kelurahan/{id?}', [WilayahController::class, 'kelurahan'])->name('get-kelurahan');
+Route::get('/cek-biaya/{id?}', [BiayaController::class, 'cek_biaya'])->name('cek-biaya');
 
 Route::get('/pendaftaran', [AuthController::class, 'daftar'])->name('daftar')->middleware('guest');
 Route::post('/pendaftaran', [AuthController::class, 'daftarkan'])->name('daftarkan')->middleware('guest');
@@ -29,25 +31,16 @@ Route::post('/login', [AuthController::class, 'auth'])->name('authenticate');
 Route::middleware('auth')->group(function() {
     Route::get("home", [HomeController::class, 'index'])->name('home');
     Route::get("logout", [AuthController::class, 'logout'])->name('logout');
-
     Route::get("verifikasi", [UserController::class, 'verifikasi'])->name('verifikasi');
     Route::post("verifikasi", [UserController::class, 'verifikasi_pelanggan'])->name('verifikasi-pelanggan');
 
+    Route::prefix("pengiriman")->group(function() {
+        Route::get("request-pengiriman", [PengirimanController::class, 'request_pengiriman'])->name('request-pengiriman');
+        Route::get("tambah-request-pengiriman/{id?}", [PengirimanController::class, 'tambah_request_pengiriman'])->name('tambah-request-pengiriman');
+        Route::post("simpan-request-pengiriman", [PengirimanController::class, 'simpan_request_pengiriman'])->name('simpan-request-pengiriman');
+    });
+
     Route::prefix("master-data")->group(function() {
-        Route::prefix("supir")->group(function() {
-            Route::get("/", [SupirController::class, 'index'])->name('supir');
-            Route::get("simpan/{id?}", [SupirController::class, 'data'])->name('data-supir');
-            Route::post("simpan/{id?}", [SupirController::class, 'simpan'])->name('simpan-supir');
-            Route::post("hapus", [SupirController::class, 'hapus'])->name('hapus-supir');
-        });
-
-        Route::prefix("biaya")->group(function() {
-            Route::get("/", [BiayaController::class, 'index'])->name('biaya');
-            Route::get("simpan/{id?}", [BiayaController::class, 'data'])->name('data-biaya');
-            Route::post("simpan/{id?}", [BiayaController::class, 'simpan'])->name('simpan-biaya');
-            Route::post("hapus", [BiayaController::class, 'hapus'])->name('hapus-biaya');
-        });
-
         Route::prefix("admin")->group(function() {
             Route::get("/", [UserController::class, 'admin'])->name('admin');
             Route::get("simpan/{id?}", [UserController::class, 'data_admin'])->name('data-admin');
@@ -85,6 +78,33 @@ Route::middleware('auth')->group(function() {
                 Route::get("list/{id?}", [KendaraanController::class, 'index'])->name('list-kendaraan');
                 Route::post("simpan", [KendaraanController::class, 'simpan'])->name('simpan-kendaraan');
                 Route::post("hapus", [KendaraanController::class, 'hapus'])->name('hapus-kendaraan');
+            });
+        });
+
+        Route::prefix("users")->group(function() {
+            Route::get("/", [UserController::class, 'users'])->name('users');
+            Route::post("nonactive", [UserController::class, 'nonactive_user'])->name('nonactive-user');
+            Route::post("active", [UserController::class, 'active_user'])->name('active-user');
+        });
+
+
+        Route::prefix("pesanan")->group(function() {
+            Route::prefix("biaya")->group(function() {
+                Route::get("/", [BiayaController::class, 'index'])->name('biaya');
+                Route::get("simpan/{id?}", [BiayaController::class, 'data'])->name('data-biaya');
+                Route::post("simpan/{id?}", [BiayaController::class, 'simpan'])->name('simpan-biaya');
+                Route::post("hapus", [BiayaController::class, 'hapus'])->name('hapus-biaya');
+            });
+
+            Route::prefix("kendaraan")->group(function() {
+                Route::get("/", [KendaraanController::class, 'list_all'])->name('kendaraan');
+            });
+
+            Route::prefix("supir")->group(function() {
+                Route::get("/", [SupirController::class, 'index'])->name('supir');
+                Route::get("simpan/{id?}", [SupirController::class, 'data'])->name('data-supir');
+                Route::post("simpan/{id?}", [SupirController::class, 'simpan'])->name('simpan-supir');
+                Route::post("hapus", [SupirController::class, 'hapus'])->name('hapus-supir');
             });
         });
     });

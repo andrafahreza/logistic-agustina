@@ -10,6 +10,25 @@ use Illuminate\Support\Facades\DB;
 
 class BiayaController extends Controller
 {
+    public function cek_biaya($id = null)
+    {
+        $data = Biaya::where('district_id', $id)->first();
+
+        if (empty($data)) {
+            $data = [
+                "alert" => 0,
+                "data" => null
+            ];
+        } else {
+            $data = [
+                "alert" => 1,
+                "data" => "Rp. ".number_format($data->biaya)
+            ];
+        }
+
+        return response()->json($data);
+    }
+
     public function index()
     {
         $title = "biaya";
