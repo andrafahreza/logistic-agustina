@@ -40,4 +40,8 @@ class DataEkspedisi extends Model
     public function user_create(){
         return $this->belongsTo(User::class, "created_by");
     }
+
+    public function status(){
+        return $this->hasMany(StatusPesanan::class, "data_ekspedisi_id");
+    }
 }

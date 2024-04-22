@@ -56,6 +56,8 @@ class PengirimanController extends Controller
                     $status = "Proses";
                 } else if ($status->status == "denied") {
                     $status = "Ditolak";
+                } else if ($status->status == "accept") {
+                    $status = "Diterima";
                 } else {
                     $status = "Selesai";
                 }
@@ -222,6 +224,35 @@ class PengirimanController extends Controller
         }
     }
 
+    // Daftar Pemesanan
+    public function daftar_pesanan()
+    {
+        $title = "daftar pesanan";
+        $getData = DataEkspedisi::where('created_by', Auth::user()->id)->latest()->get();
+
+        $data = array();
+        foreach ($getData as $key => $value) {
+            if ($value->status->count() < 0) {
+                continue;
+            }
+
+            $statusDenied = false;
+            foreach ($value->status as $kunci => $isi) {
+                if ($isi->status == "denied") {
+                    $statusDenied = true;
+                }
+            }
+
+            if ($statusDenied) {
+                continue;
+            }
+
+            $data[] = $value;
+        }
+
+        return view('back.pages.pengiriman.daftar-pesanan.index', compact('title', 'data'));
+    }
+
     // Pengelola
     public function pengelola_pengiriman()
     {
@@ -230,11 +261,18 @@ class PengirimanController extends Controller
 
         $data = array();
         foreach ($getData as $key => $value) {
-            $cekStatus = StatusPesanan::where('data_ekspedisi_id' , $value->id)
-            ->whereNot('status', 'denied')
-            ->get();
+            if ($value->status->count() < 0) {
+                continue;
+            }
 
-            if ($cekStatus->count() > 0) {
+            $statusDenied = false;
+            foreach ($value->status as $kunci => $isi) {
+                if ($isi->status == "denied") {
+                    $statusDenied = true;
+                }
+            }
+
+            if ($statusDenied) {
                 continue;
             }
 

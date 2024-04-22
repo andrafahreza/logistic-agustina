@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function() {
         Route::post("tolak-request-pengiriman", [PengirimanController::class, 'tolak_request_pengiriman'])->name('tolak-request-pengiriman');
         Route::post("terima-request-pengiriman", [PengirimanController::class, 'terima_request_pengiriman'])->name('terima-request-pengiriman');
 
+        Route::get("daftar-pesanan", [PengirimanController::class, 'daftar_pesanan'])->name('daftar-pesanan');
+
         Route::get("pengelola-pengiriman", [PengirimanController::class, 'pengelola_pengiriman'])->name('pengelola-pengiriman');
     });
 
