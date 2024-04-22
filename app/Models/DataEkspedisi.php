@@ -25,6 +25,7 @@ class DataEkspedisi extends Model
         'note',
         'biaya',
         'file_surat_pengiriman',
+        'file_awb',
         'created_by',
     ];
 

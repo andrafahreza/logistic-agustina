@@ -2,12 +2,12 @@
 
 @section('contents')
     <div class="pagetitle">
-        <h1>Request Pengiriman Barang</h1>
+        <h1>Pengelola Pengiriman Barang</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                 <li class="breadcrumb-item">Pengiriman</li>
-                <li class="breadcrumb-item active">Request Pengiriman Barang</li>
+                <li class="breadcrumb-item active">Pengelola Pengiriman Barang</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -16,8 +16,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-body">
-                        <a href="{{ route('tambah-request-pengiriman') }}" class="btn btn-primary mt-4">+ Tambah</a> <br><br>
+                    <div class="card-body"><br><br>
                         @if ($errors->any())
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <strong>Error!</strong>  {{ $errors->first() }}
@@ -73,10 +72,9 @@
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-secondary" onclick="detail({{ $item->id }})">Detail</button>
-
                                             @if (empty($status))
-                                                {{-- <button type="button" class="btn btn-warning" onclick="edit({{ $item->id }})">Edit</button> --}}
-                                                <button type="button" class="btn btn-danger" onclick="hapus({{ $item->id }})">Hapus</button>
+                                                <button type="button" class="btn btn-success" onclick="terima({{ $item->id }})">Terima</button>
+                                                <button type="button" class="btn btn-danger" onclick="tolak({{ $item->id }})">Tolak</button>
                                             @endif
                                         </td>
                                     </tr>
@@ -164,22 +162,77 @@
         </div>
     </div><!-- End Large Modal-->
 
-    <div class="modal fade" id="hapus" tabindex="-1">
+    <div class="modal fade" id="tolak" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('hapus-request-pengiriman') }}" method="POST" id="formTHapus">
+                <form action="{{ route('tolak-request-pengiriman') }}" method="POST" id="formTolak">
                     @csrf
-                    <input type="hidden" name="id" id="idHapus">
+                    <input type="hidden" name="id" id="idTolak">
                     <div class="modal-header">
-                        <h5 class="modal-title">Hapus Data</h5>
+                        <h5 class="modal-title">Tolak Data</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Yakin ingin menghapus data ini?</p>
+                        <p>Yakin ingin menolak data ini?</p>
+                        <label>Alasan penolakan</label> <br>
+                        <textarea name="note" class="form-control" required></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-danger">Hapus</button>
+                        <button type="submit" class="btn btn-danger">Tolak</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- End Large Modal-->
+
+    <div class="modal fade" id="terima" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('terima-request-pengiriman') }}" method="POST" id="formTolak" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="id" id="idTerima">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Terima Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Vendor <span class="text-danger">*</span></label>
+                                <select class="form-control" id="vendor" required>
+                                    <option value="">Pilih Vendor</option>
+                                    @foreach ($vendor as $item)
+                                        <option value="{{ $item->id }}">{{ $item->kode }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 mt-4">
+                                <label>Kendaraan <span class="text-danger">*</span></label>
+                                <select class="form-control" id="kendaraanSelect" name="kendaraan_id" required></select>
+                            </div>
+                            <div class="col-md-12 mt-4">
+                                <label>Supir <span class="text-danger">*</span></label>
+                                <select class="form-control" id="supir" name="supir_id" required>
+                                    <option value="">Pilih Supir</option>
+                                    @foreach ($supir as $item)
+                                        <option value="{{ $item->id }}">{{ $item->sim }} - {{ $item->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 mt-4">
+                                <label>No Awb <span class="text-danger">*</span></label>
+                                <input class="form-control" name="no_awb" required>
+                            </div>
+                            <div class="col-md-12 mt-4">
+                                <label>File Awb <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="file_awb" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-success">Terima</button>
                     </div>
                 </form>
             </div>
@@ -232,9 +285,47 @@
             });
         }
 
-        function hapus(id) {
-            $('#idHapus').val(id);
-            $('#hapus').modal('toggle');
+        function tolak(id) {
+            $('#idTolak').val(id);
+            $('#tolak').modal('toggle');
         }
+
+        function terima(id) {
+            $('#idTerima').val(id);
+            $('#terima').modal('toggle');
+        }
+
+        $('#vendor').on('change', function () {
+            var url = "{{ route('cek-kendaraan') }}" + "/" + $(this).val();
+
+            $.ajax({
+                type: "get",
+                url: url,
+                dataType: "JSON",
+                success: function(response) {
+                    $('#kendaraanSelect')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="">Pilih Kendaraan</option>')
+                    .val('');
+
+                    if (response.alert == '1') {
+                        console.log(response.data);
+                        $.each(response.data, function (i, item) {
+                            $('#kendaraanSelect').append($('<option>', {
+                                value: item.id,
+                                text : item.no_kendaraan + " - " + item.jenis_kendaraan + " - " + item.merk
+                            }));
+                        });
+                    } else {
+                        alert("Gagal mengambil data kendaraan, silahkan coba lagi");
+                    }
+                },
+                error: function(response) {
+                    alert("Gagal mengambil data kendaraan, silahkan coba lagi");
+                }
+            });
+        });
     </script>
 @endpush

@@ -22,6 +22,7 @@ Route::get('/kontak', [PenggunaController::class, 'kontak'])->name('kontak-kami'
 Route::get('/kecamatan/{id?}', [WilayahController::class, 'kecamatan'])->name('get-kecamatan');
 Route::get('/kelurahan/{id?}', [WilayahController::class, 'kelurahan'])->name('get-kelurahan');
 Route::get('/cek-biaya/{id?}', [BiayaController::class, 'cek_biaya'])->name('cek-biaya');
+Route::get('/cek-kendaraan/{id?}', [KendaraanController::class, 'cek_kendaraan'])->name('cek-kendaraan');
 
 Route::get('/pendaftaran', [AuthController::class, 'daftar'])->name('daftar')->middleware('guest');
 Route::post('/pendaftaran', [AuthController::class, 'daftarkan'])->name('daftarkan')->middleware('guest');
@@ -36,8 +37,14 @@ Route::middleware('auth')->group(function() {
 
     Route::prefix("pengiriman")->group(function() {
         Route::get("request-pengiriman", [PengirimanController::class, 'request_pengiriman'])->name('request-pengiriman');
+        Route::get("data-request-pengiriman/{id?}", [PengirimanController::class, 'data_request_pengiriman'])->name('data-request-pengiriman');
         Route::get("tambah-request-pengiriman/{id?}", [PengirimanController::class, 'tambah_request_pengiriman'])->name('tambah-request-pengiriman');
         Route::post("simpan-request-pengiriman", [PengirimanController::class, 'simpan_request_pengiriman'])->name('simpan-request-pengiriman');
+        Route::post("hapus-request-pengiriman", [PengirimanController::class, 'hapus_request_pengiriman'])->name('hapus-request-pengiriman');
+        Route::post("tolak-request-pengiriman", [PengirimanController::class, 'tolak_request_pengiriman'])->name('tolak-request-pengiriman');
+        Route::post("terima-request-pengiriman", [PengirimanController::class, 'terima_request_pengiriman'])->name('terima-request-pengiriman');
+
+        Route::get("pengelola-pengiriman", [PengirimanController::class, 'pengelola_pengiriman'])->name('pengelola-pengiriman');
     });
 
     Route::prefix("master-data")->group(function() {

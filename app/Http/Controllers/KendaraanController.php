@@ -9,6 +9,26 @@ use Illuminate\Support\Facades\DB;
 
 class KendaraanController extends Controller
 {
+    public function cek_kendaraan($id = null)
+    {
+        $data = Kendaraan::where('vendor_id', $id)->get();
+
+        if (empty($data)) {
+            $data = [
+                "alert" => 0,
+                "data" => null
+            ];
+        } else {
+            $data = [
+                "alert" => 1,
+                "data" => $data
+            ];
+        }
+
+
+        return response()->json($data);
+    }
+
     public function index($id = null)
     {
         $title = "vendor";

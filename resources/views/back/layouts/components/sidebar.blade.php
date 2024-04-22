@@ -10,18 +10,29 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-        <li class="nav-item">
-            <a class="nav-link @if ($title != 'request pengiriman') collapsed @endif" data-bs-target="#pengiriman" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-truck"></i><span>Pengiriman</span><i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul id="pengiriman" class="nav-content collapse @if ($title == 'request pengiriman') show @endif" data-bs-parent="#sidebar-nav">
-                <li>
-                    <a href="{{ route('request-pengiriman') }}" @if ($title == 'request pengiriman') class="active" @endif>
-                        <i class="bi bi-circle"></i><span>Request Pengiriman Barang</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
+        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "pelanggan")
+            <li class="nav-item">
+                <a class="nav-link @if ($title != 'request pengiriman' && $title != 'pengelola pengiriman') collapsed @endif" data-bs-target="#pengiriman" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-truck"></i><span>Pengiriman</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="pengiriman" class="nav-content collapse @if ($title == 'request pengiriman' || $title == 'pengelola pengiriman') show @endif" data-bs-parent="#sidebar-nav">
+                    @if (auth()->user()->level->nama_level == "pelanggan")
+                        <li>
+                            <a href="{{ route('request-pengiriman') }}" @if ($title == 'request pengiriman') class="active" @endif>
+                                <i class="bi bi-circle"></i><span>Request Pengiriman Barang</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->level->nama_level == "operasional")
+                        <li>
+                            <a href="{{ route('pengelola-pengiriman') }}" @if ($title == 'pengelola pengiriman') class="active" @endif>
+                                <i class="bi bi-circle"></i><span>Pengelola Pengiriman Barang</span>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
 
         @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
             <li class="nav-item">
