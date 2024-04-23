@@ -408,6 +408,155 @@ class UserController extends Controller
         }
     }
 
+    // Keuangan
+    public function keuangan()
+    {
+        $title = "keuangan";
+        $level = Level::where('nama_level', 'keuangan')->first();
+        if (empty($level)) {
+            abort(404);
+        }
+
+        $data = User::whereNot("id", Auth::user()->id)
+        ->where('level_id', $level->id)
+        ->latest()
+        ->get();
+
+        return view('back.pages.user.keuangan', compact(['title', 'data']));
+    }
+
+    public function data_keuangan($id)
+    {
+        $data = User::find($id);
+
+        try {
+            return response()->json([
+                'alert' => 1,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            $message = $th->getMessage();
+            return response()->json([
+                'alert' => 0,
+                'message' => "Error: $message"
+            ]);
+        }
+    }
+
+    public function simpan_keuangan(Request $request, $id = null)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = User::find($id);
+
+            if (empty($data)) {
+                $level = Level::where('nama_level', 'keuangan')->first();
+                if (empty($level)) {
+                    throw new \Exception("Level keuangan belum ditambahkan");
+                }
+
+                $data = User::create([
+                    "level_id" => $level->id,
+                    "username" => $request->username,
+                    "password" => Hash::make($request->password),
+                    "nama" => $request->nama,
+                    "jenis_kelamin" => $request->jenis_kelamin,
+                    "alamat" => $request->alamat,
+                    "email" => $request->email,
+                    "no_telepon" => $request->no_telepon,
+                    "status" => "active"
+                ]);
+
+                if (!$data->save()) {
+                    throw new \Exception("Gagal menambah data2");
+                }
+
+            } else {
+                $data->username = $request->username;
+                $data->nama = $request->nama;
+                $data->alamat = $request->alamat;
+                $data->email = $request->email;
+                $data->no_telepon = $request->no_telepon;
+
+                if (!$data->update()) {
+                    throw new \Exception("Gagal mengubah data");
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('keuangan')->with('success', "Berhasil menyimpan data");
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function nonactive_keuangan(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $pengguna = User::find($request->id);
+            $pengguna->status = "non_active";
+
+            if (!$pengguna->update()) {
+                throw new \Exception("Gagal menonaktifkan keuangan");
+            }
+
+            DB::commit();
+
+            return redirect()->route('keuangan')->with('success', "Berhasil menonaktifkan keuangan");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function active_keuangan(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $pengguna = User::find($request->id);
+            $pengguna->status = "active";
+
+            if (!$pengguna->update()) {
+                throw new \Exception("Gagal mengaktifkan keuangan");
+            }
+
+            DB::commit();
+
+            return redirect()->route('keuangan')->with('success', "Berhasil mengaktifkan keuangan");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function hapus_keuangan(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = User::find($request->id);
+
+            if (!$data->delete()) {
+                throw new \Exception("Gagal menghapus keuangan");
+            }
+
+
+            DB::commit();
+
+            return redirect()->route('keuangan')->with('success', "Berhasil menghapus keuangan");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
     // Kepala perusahaan
     public function kepala()
     {

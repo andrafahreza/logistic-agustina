@@ -44,4 +44,12 @@ class DataEkspedisi extends Model
     public function status(){
         return $this->hasMany(StatusPesanan::class, "data_ekspedisi_id");
     }
+
+    public function pembayaran_pelanggan(){
+        return $this->hasMany(PembayaranPelanggan::class, "data_ekspedisi_id");
+    }
+
+    public function pembayaran_vendor(){
+        return $this->hasMany(PembayaranVendor::class, "data_ekspedisi_id");
+    }
 }

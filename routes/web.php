@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KendaraanController;
+use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\SupirController;
@@ -68,6 +69,15 @@ Route::middleware('auth')->group(function() {
             Route::post("hapus", [UserController::class, 'hapus_operator'])->name('hapus-operator');
         });
 
+        Route::prefix("keuangan")->group(function() {
+            Route::get("/", [UserController::class, 'keuangan'])->name('keuangan');
+            Route::get("simpan/{id?}", [UserController::class, 'data_keuangan'])->name('data-keuangan');
+            Route::post("simpan/{id?}", [UserController::class, 'simpan_keuangan'])->name('simpan-keuangan');
+            Route::post("nonactive", [UserController::class, 'nonactive_keuangan'])->name('nonactive-keuangan');
+            Route::post("active", [UserController::class, 'active_keuangan'])->name('active-keuangan');
+            Route::post("hapus", [UserController::class, 'hapus_keuangan'])->name('hapus-keuangan');
+        });
+
         Route::prefix("kepala")->group(function() {
             Route::get("/", [UserController::class, 'kepala'])->name('kepala');
             Route::get("simpan/{id?}", [UserController::class, 'data_kepala'])->name('data-kepala');
@@ -96,7 +106,6 @@ Route::middleware('auth')->group(function() {
             Route::post("active", [UserController::class, 'active_user'])->name('active-user');
         });
 
-
         Route::prefix("pesanan")->group(function() {
             Route::prefix("biaya")->group(function() {
                 Route::get("/", [BiayaController::class, 'index'])->name('biaya');
@@ -115,6 +124,14 @@ Route::middleware('auth')->group(function() {
                 Route::post("simpan/{id?}", [SupirController::class, 'simpan'])->name('simpan-supir');
                 Route::post("hapus", [SupirController::class, 'hapus'])->name('hapus-supir');
             });
+        });
+    });
+
+    Route::prefix("keuangan")->group(function() {
+        Route::prefix("hutang-piutang")->group(function() {
+            Route::get("/", [KeuanganController::class, 'hutang_piutang'])->name('hutang-piutang');
+            Route::post("simpan-pembayaran-ekspedisi", [KeuanganController::class, 'simpan_pembayaran_ekspedisi'])->name('simpan-pembayaran-ekspedisi');
+            Route::post("hapus-pembayaran-ekspedisi", [KeuanganController::class, 'hapus_pembayaran_ekspedisi'])->name('hapus-pembayaran-ekspedisi');
         });
     });
 

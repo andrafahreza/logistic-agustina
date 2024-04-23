@@ -50,10 +50,10 @@
 
         @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
             <li class="nav-item">
-                <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin" || $title == 'users') collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
+                <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin" || $title == 'users' || $title == 'keuangan') collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-person"></i><span>Employeed</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor' || $title == 'admin' || $title == 'kepala perusahaan' || $title == 'operator' || $title == 'users') show @endif" data-bs-parent="#sidebar-nav">
+                <ul id="pengguna" class="nav-content collapse @if ($title == 'vendor' || $title == 'admin' || $title == 'kepala perusahaan' || $title == 'operator' || $title == 'users' || $title == 'keuangan') show @endif" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="{{ route('admin') }}" @if ($title == 'admin') class="active" @endif>
                             <i class="bi bi-circle"></i><span>Admin</span>
@@ -67,6 +67,11 @@
                     <li>
                         <a href="{{ route('kepala') }}" @if ($title == 'kepala perusahaan') class="active" @endif>
                             <i class="bi bi-circle"></i><span>Kepala Perusahaan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('keuangan') }}" @if ($title == 'keuangan') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Keuangan</span>
                         </a>
                     </li>
                     <li>
@@ -96,6 +101,21 @@
                         </a>
                         <a href="{{ route('supir') }}" @if ($title == 'supir') class="active" @endif>
                             <i class="bi bi-circle"></i><span>Supir</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endif
+
+        @if (auth()->user()->level->nama_level == 'keuangan')
+            <li class="nav-item">
+                <a class="nav-link @if ($title != 'hutang & piutang') collapsed @endif" data-bs-target="#keuangan" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-cash"></i><span>Keuangan</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="keuangan" class="nav-content collapse @if ($title == 'hutang & piutang') show @endif" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="{{ route('hutang-piutang') }}" @if ($title == 'hutang & piutang') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Hutang & Piutang</span>
                         </a>
                     </li>
                 </ul>

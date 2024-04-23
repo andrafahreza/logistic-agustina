@@ -302,7 +302,7 @@ class PengirimanController extends Controller
             $status = StatusPesanan::create([
                 "data_ekspedisi_id" => $data->id,
                 "waktu" => date('Y-m-d H:i:s'),
-                "note" => "Pesanan diterima, sedang diproses",
+                "note" => "Pesanan diterima, sedang diproses terkait pembayaran",
                 "status" => "accept"
             ]);
 
