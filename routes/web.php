@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiayaController;
+use App\Http\Controllers\CabangController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\PengirimanController;
+use App\Http\Controllers\PenjemputanController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
@@ -17,37 +18,38 @@ Route::get('/', [PenggunaController::class, 'index'])->name('beranda');
 Route::get('/tentang', [PenggunaController::class, 'tentang'])->name('tentang-kami');
 Route::get('/layanan', [PenggunaController::class, 'layanan'])->name('layanan');
 Route::get('/ceh-harga', [PenggunaController::class, 'cekHarga'])->name('cek-harga');
-Route::get('/syarat', [PenggunaController::class, 'syarat'])->name('syarat');
+Route::match(array('GET', 'POST'), '/track', [PenggunaController::class, 'track'])->name('track');
 Route::get('/kontak', [PenggunaController::class, 'kontak'])->name('kontak-kami');
-
-Route::get('/kecamatan/{id?}', [WilayahController::class, 'kecamatan'])->name('get-kecamatan');
-Route::get('/kelurahan/{id?}', [WilayahController::class, 'kelurahan'])->name('get-kelurahan');
 Route::get('/cek-biaya/{id?}', [BiayaController::class, 'cek_biaya'])->name('cek-biaya');
-Route::get('/cek-kendaraan/{id?}', [KendaraanController::class, 'cek_kendaraan'])->name('cek-kendaraan');
-
-Route::get('/pendaftaran', [AuthController::class, 'daftar'])->name('daftar')->middleware('guest');
-Route::post('/pendaftaran', [AuthController::class, 'daftarkan'])->name('daftarkan')->middleware('guest');
 Route::get('/login', [AuthController::class, 'login'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'auth'])->name('authenticate');
 
 Route::middleware('auth')->group(function() {
     Route::get("home", [HomeController::class, 'index'])->name('home');
+    Route::get("ganti-password", [UserController::class, 'ganti_password'])->name('ganti-password');
+    Route::post("ganti-password", [UserController::class, 'action_ganti_password'])->name('action-ganti-password');
     Route::get("logout", [AuthController::class, 'logout'])->name('logout');
-    Route::get("verifikasi", [UserController::class, 'verifikasi'])->name('verifikasi');
-    Route::post("verifikasi", [UserController::class, 'verifikasi_pelanggan'])->name('verifikasi-pelanggan');
+
+    Route::prefix("penjemputan")->group(function() {
+        Route::get("/", [PenjemputanController::class, 'index'])->name('pengelola-penjemputan');
+        Route::get("data-penjemputan/{id?}", [PenjemputanController::class, 'data'])->name('data-penjemputan');
+        Route::post("simpan-penjemputan/{id?}", [PenjemputanController::class, 'simpan'])->name('simpan-penjemputan');
+        Route::post("hapus-penjemputan", [PenjemputanController::class, 'hapus'])->name('hapus-penjemputan');
+        Route::post("batal-penjemputan", [PenjemputanController::class, 'batal'])->name('batal-penjemputan');
+        Route::post("upload-penjemputan", [PenjemputanController::class, 'upload'])->name('upload-penjemputan');
+    });
 
     Route::prefix("pengiriman")->group(function() {
         Route::get("request-pengiriman", [PengirimanController::class, 'request_pengiriman'])->name('request-pengiriman');
-        Route::get("data-request-pengiriman/{id?}", [PengirimanController::class, 'data_request_pengiriman'])->name('data-request-pengiriman');
         Route::get("tambah-request-pengiriman/{id?}", [PengirimanController::class, 'tambah_request_pengiriman'])->name('tambah-request-pengiriman');
-        Route::post("simpan-request-pengiriman", [PengirimanController::class, 'simpan_request_pengiriman'])->name('simpan-request-pengiriman');
         Route::post("hapus-request-pengiriman", [PengirimanController::class, 'hapus_request_pengiriman'])->name('hapus-request-pengiriman');
-        Route::post("tolak-request-pengiriman", [PengirimanController::class, 'tolak_request_pengiriman'])->name('tolak-request-pengiriman');
-        Route::post("terima-request-pengiriman", [PengirimanController::class, 'terima_request_pengiriman'])->name('terima-request-pengiriman');
+
 
         Route::get("daftar-pesanan", [PengirimanController::class, 'daftar_pesanan'])->name('daftar-pesanan');
-
+        Route::get("data-request-pengiriman/{id?}", [PengirimanController::class, 'data_request_pengiriman'])->name('data-request-pengiriman');
+        Route::post("simpan-request-pengiriman", [PengirimanController::class, 'simpan_request_pengiriman'])->name('simpan-request-pengiriman');
         Route::get("pengelola-pengiriman", [PengirimanController::class, 'pengelola_pengiriman'])->name('pengelola-pengiriman');
+        Route::post("update-pesanan", [PengirimanController::class, 'update_pesanan'])->name('update-pesanan');
     });
 
     Route::prefix("master-data")->group(function() {
@@ -85,37 +87,24 @@ Route::middleware('auth')->group(function() {
             Route::post("hapus", [UserController::class, 'hapus_kepala'])->name('hapus-kepala');
         });
 
-        Route::prefix("vendor")->group(function() {
-            Route::get("/", [VendorController::class, 'index'])->name('vendor');
-            Route::get("simpan/{id?}", [VendorController::class, 'data'])->name('data-vendor');
-            Route::post("simpan/{id?}", [VendorController::class, 'simpan'])->name('simpan-vendor');
-            Route::post("nonactive", [VendorController::class, 'nonactive'])->name('nonactive-vendor');
-            Route::post("active", [VendorController::class, 'active'])->name('active-vendor');
-            Route::post("hapus", [VendorController::class, 'hapus'])->name('hapus-vendor');
-
-            Route::prefix("kendaraan")->group(function() {
-                Route::get("list/{id?}", [KendaraanController::class, 'index'])->name('list-kendaraan');
-                Route::post("simpan", [KendaraanController::class, 'simpan'])->name('simpan-kendaraan');
-                Route::post("hapus", [KendaraanController::class, 'hapus'])->name('hapus-kendaraan');
-            });
-        });
-
         Route::prefix("users")->group(function() {
-            Route::get("/", [UserController::class, 'users'])->name('users');
             Route::post("nonactive", [UserController::class, 'nonactive_user'])->name('nonactive-user');
             Route::post("active", [UserController::class, 'active_user'])->name('active-user');
         });
 
         Route::prefix("pesanan")->group(function() {
+            Route::prefix("cabang")->group(function() {
+                Route::get("/", [CabangController::class, 'index'])->name('cabang');
+                Route::get("simpan/{id?}", [CabangController::class, 'data'])->name('data-cabang');
+                Route::post("simpan/{id?}", [CabangController::class, 'simpan'])->name('simpan-cabang');
+                Route::post("hapus", [CabangController::class, 'hapus'])->name('hapus-cabang');
+            });
+
             Route::prefix("biaya")->group(function() {
                 Route::get("/", [BiayaController::class, 'index'])->name('biaya');
                 Route::get("simpan/{id?}", [BiayaController::class, 'data'])->name('data-biaya');
                 Route::post("simpan/{id?}", [BiayaController::class, 'simpan'])->name('simpan-biaya');
                 Route::post("hapus", [BiayaController::class, 'hapus'])->name('hapus-biaya');
-            });
-
-            Route::prefix("kendaraan")->group(function() {
-                Route::get("/", [KendaraanController::class, 'list_all'])->name('kendaraan');
             });
 
             Route::prefix("supir")->group(function() {
@@ -128,8 +117,9 @@ Route::middleware('auth')->group(function() {
     });
 
     Route::prefix("keuangan")->group(function() {
-        Route::prefix("hutang-piutang")->group(function() {
-            Route::get("/", [KeuanganController::class, 'hutang_piutang'])->name('hutang-piutang');
+        Route::prefix("laporan-keuangan")->group(function() {
+            Route::get("/", [KeuanganController::class, 'laporan_keuangan'])->name('laporan-keuangan');
+            Route::get("/cetak", [KeuanganController::class, 'cetak_laporan_keuangan'])->name('cetak-laporan-keuangan');
             Route::post("simpan-pembayaran-ekspedisi", [KeuanganController::class, 'simpan_pembayaran_ekspedisi'])->name('simpan-pembayaran-ekspedisi');
             Route::post("hapus-pembayaran-ekspedisi", [KeuanganController::class, 'hapus_pembayaran_ekspedisi'])->name('hapus-pembayaran-ekspedisi');
         });

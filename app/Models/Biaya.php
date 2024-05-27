@@ -12,7 +12,7 @@ class Biaya extends Model
     protected $table    = 'biaya';
     protected $fillable = [
         'id',
-        'district_id',
+        'cabang_id',
         'biaya',
         'service',
         'minimal_berat',
@@ -20,7 +20,7 @@ class Biaya extends Model
         'jangka_waktu',
     ];
 
-    public function district(){
-        return $this->belongsTo(Districts::class, "district_id");
+    public function cabang(){
+        return $this->belongsTo(Cabang::class, "cabang_id");
     }
 }

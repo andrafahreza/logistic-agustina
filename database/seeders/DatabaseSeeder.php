@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             'level_id' => $level->id,
             'username' => 'admin',
             'password' => Hash::make('password'),
-            'nama' => "Admin",
+            'nama' => "Administrator",
             'jenis_kelamin' => 'l',
             'alamat' => 'Jl. Sunggal',
             'email' => 'admin@gmail.com',

@@ -7,7 +7,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                 <li class="breadcrumb-item">Master Data</li>
-                <li class="breadcrumb-item active">Biaya Pengiriman</li>
+                <li class="breadcrumb-item active">Cabang</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -36,12 +36,7 @@
                             <thead>
                                 <tr>
                                     <th>#ID</th>
-                                    <th>Cabang</th>
-                                    <th>Biaya</th>
-                                    <th>Service</th>
-                                    <th>Minimal Berat</th>
-                                    <th>Pengiriman</th>
-                                    <th>Jangka Waktu</th>
+                                    <th>Nama Cabang</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -49,12 +44,7 @@
                                 @foreach ($data as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->cabang->nama_cabang }}</td>
-                                        <td>Rp. {{ number_format((int)$item->biaya) }}</td>
-                                        <td>{{ $item->service }}</td>
-                                        <td>{{ $item->minimal_berat }}</td>
-                                        <td>{{ $item->pengiriman }}</td>
-                                        <td>{{ $item->jangka_waktu }}</td>
+                                        <td>{{ $item->nama_cabang }}</td>
                                         <td>
                                             <button type="button" class="btn btn-warning" onclick="edit({{ $item->id }})">Edit</button>
                                             <button type="button" class="btn btn-danger" onclick="hapus({{ $item->id }})">Hapus</button>
@@ -74,7 +64,7 @@
     <div class="modal fade" id="tambah" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('simpan-biaya') }}" method="POST" id="formTambah">
+                <form action="{{ route('simpan-cabang') }}" method="POST" id="formTambah">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Tambah Data</h5>
@@ -89,33 +79,8 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 mt-4">
-                                <label>Cabang</label>
-                                <select class="form-control" id="cabang" name="cabang_id" required>
-                                    <option value="">Pilih Cabang</option>
-                                    @foreach ($cabang as $item)
-                                        <option value="{{ $item->id }}">{{ $item->nama_cabang }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-12 mt-4">
-                                <label>Biaya</label>
-                                <input class="form-control" id="biaya" type="number" name="biaya" required>
-                            </div>
-                            <div class="col-md-12 mt-4">
-                                <label>Service</label>
-                                <input class="form-control" id="service" name="service" required>
-                            </div>
-                            <div class="col-md-12 mt-4">
-                                <label>Minimal Berat</label>
-                                <input type="text" class="form-control" id="minimal_berat" name="minimal_berat" required>
-                            </div>
-                            <div class="col-md-12 mt-4">
-                                <label>Pengiriman</label>
-                                <input type="text" class="form-control" id="pengiriman" name="pengiriman" required>
-                            </div>
-                            <div class="col-md-12 mt-4">
-                                <label>Jangka Waktu</label>
-                                <input type="text" class="form-control" id="jangka_waktu" name="jangka_waktu" required>
+                                <label>Nama Cabang</label>
+                                <input class="form-control" id="nama_cabang" type="text" name="nama_cabang" required>
                             </div>
                         </div>
                     </div>
@@ -131,7 +96,7 @@
     <div class="modal fade" id="hapus" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('hapus-biaya') }}" method="POST" id="formTHapus">
+                <form action="{{ route('hapus-cabang') }}" method="POST" id="formTHapus">
                     @csrf
                     <input type="hidden" name="id" id="idHapus">
                     <div class="modal-header">
@@ -158,11 +123,11 @@
         $('#btnTambah').click(function() {
             $('#error-message').addClass('d-none');
             $('#formTambah')[0].reset();
-            $('#formTambah').attr("action", "{{ route('simpan-biaya') }}")
+            $('#formTambah').attr("action", "{{ route('simpan-cabang') }}")
         });
 
         function edit(id) {
-            var url = "{{ route('data-biaya') }}" + "/" + id;
+            var url = "{{ route('data-cabang') }}" + "/" + id;
             $.ajax({
                 type: "get",
                 url: url,
@@ -174,13 +139,8 @@
 
                         const data = response.data;
                         $('#formTambah')[0].reset();
-                        $('#formTambah').attr("action", "{{ route('simpan-biaya') }}" + "/" + data.id);
-                        $('#cabang').val(data.cabang_id);
-                        $('#biaya').val(data.biaya);
-                        $('#service').val(data.service);
-                        $('#minimal_berat').val(data.minimal_berat);
-                        $('#pengiriman').val(data.pengiriman);
-                        $('#jangka_waktu').val(data.jangka_waktu);
+                        $('#formTambah').attr("action", "{{ route('simpan-cabang') }}" + "/" + data.id);
+                        $('#nama_cabang').val(data.nama_cabang);
                     } else {
                         $('#error-message').removeClass('d-none');
                     }

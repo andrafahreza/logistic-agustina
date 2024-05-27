@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('data_ekspedisi', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('kendaraan_id')->nullable();
-            $table->unsignedBigInteger('supir_id')->nullable();
-            $table->integer('district_id');
-            $table->string('no_awb');
+            $table->unsignedBigInteger('supir_id');
+            $table->unsignedBigInteger('penjemputan_id');
+            $table->unsignedBigInteger('cabang_id');
+            $table->string('no_resi');
+            $table->string('nama_asal');
             $table->string('nama_penerima');
             $table->text('alamat_asal');
             $table->text('alamat_penerima');
@@ -25,11 +26,13 @@ return new class extends Migration
             $table->string('volume');
             $table->text('note');
             $table->integer('biaya');
-            $table->string('file_surat_pengiriman');
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
-            $table->foreign("kendaraan_id")->references("id")->on("kendaraan");
             $table->foreign("supir_id")->references("id")->on("supir");
+            $table->foreign("penjemputan_id")->references("id")->on("penjemputan");
+            $table->foreign("cabang_id")->references("id")->on("cabang");
+            $table->foreign("created_by")->references("id")->on("pengguna");
         });
     }
 

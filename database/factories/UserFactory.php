@@ -19,14 +19,12 @@ class UserFactory extends Factory
     {
         return [
             'level_id' => 1,
-            'pelanggan_id' => null,
-            'vendor_id' => null,
             'username' => "admin",
-            'name' => "Administrator",
-            'email' => "admin@gmail.com",
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'nama' => "Administrator",
             'jenis_kelamin' => 'l',
-            'alamat' => "Jalan",
+            'alamat' => "Jl. Sunggal",
+            'email' => "admin@gmail.com",
             'no_telepon' => '123123',
             'status' => 'active'
         ];

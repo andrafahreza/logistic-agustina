@@ -16,4 +16,8 @@ class Supir extends Model
         'sim',
         'alamat'
     ];
+
+    public function data_ekspedisi(){
+        return $this->hasOne(DataEkspedisi::class, "supir_id", "id");
+    }
 }

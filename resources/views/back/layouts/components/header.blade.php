@@ -29,9 +29,9 @@
                     </li>
 
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+                        <a class="dropdown-item d-flex align-items-center" href="{{ route('ganti-password') }}">
                             <i class="bi bi-person"></i>
-                            <span>My Profile</span>
+                            <span>Ganti Password</span>
                         </a>
                     </li>
                     <li>

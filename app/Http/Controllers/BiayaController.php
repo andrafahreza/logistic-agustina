@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Biaya;
+use App\Models\Cabang;
 use App\Models\Districts;
 use App\Models\Provinces;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class BiayaController extends Controller
 {
     public function cek_biaya($id = null)
     {
-        $data = Biaya::where('district_id', $id)->first();
+        $data = Biaya::where('cabang_id', $id)->first();
 
         if (empty($data)) {
             $data = [
@@ -33,9 +34,9 @@ class BiayaController extends Controller
     {
         $title = "biaya";
         $data = Biaya::latest()->get();
-        $province = Provinces::get();
+        $cabang = Cabang::latest()->get();
 
-        return view('back.pages.biaya.index', compact(['title', 'data', 'province']));
+        return view('back.pages.biaya.index', compact(['title', 'data', 'cabang']));
     }
 
     public function data($id)
@@ -62,15 +63,19 @@ class BiayaController extends Controller
 
         try {
             $data = Biaya::find($id);
-
-            $cekDistrict = Districts::find($request->district_id);
-            if (empty($cekDistrict)) {
-                throw new \Exception("Kelurahan tidak ditemukan");
+            $cabang = Cabang::find($request->cabang_id);
+            if (empty($cabang)) {
+                throw new \Exception("Cabang tidak ditemukan");
             }
 
             if (empty($data)) {
+                $check = Biaya::where('cabang_id', $request->cabang_id)->first();
+                if (!empty($check)) {
+                    throw new \Exception("Biaya pengiriman di cabang ". $check->cabang->nama_cabang." sudah ada");
+                }
+
                 $data = Biaya::create([
-                    "district_id" => $request->district_id,
+                    "cabang_id" => $request->cabang_id,
                     "biaya" => $request->biaya,
                     "service" => $request->service,
                     "minimal_berat" => $request->minimal_berat,
@@ -82,7 +87,14 @@ class BiayaController extends Controller
                     throw new \Exception("Gagal menambah data");
                 }
             } else {
-                $data->district_id = $request->district_id;
+                $check = Biaya::where('cabang_id', $request->cabang_id)
+                ->whereNot('id', $data->id)
+                ->first();
+                if (!empty($check)) {
+                    throw new \Exception("Biaya pengiriman di cabang ". $check->cabang->nama_cabang." sudah ada");
+                }
+
+                $data->cabang_id = $request->cabang_id;
                 $data->biaya = $request->biaya;
                 $data->service = $request->service;
                 $data->minimal_berat = $request->minimal_berat;

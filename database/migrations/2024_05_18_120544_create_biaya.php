@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('biaya', function (Blueprint $table) {
             $table->id();
-            $table->string('district_id');
-            $table->bigInteger('biaya');
+            $table->unsignedBigInteger('cabang_id');
+            $table->integer('biaya');
             $table->string('service');
             $table->string('minimal_berat');
             $table->string('pengiriman');
             $table->string('jangka_waktu');
             $table->timestamps();
+
+            $table->foreign("cabang_id")->references("id")->on("cabang");
         });
     }
 

@@ -7,12 +7,13 @@ use App\Models\PembayaranPelanggan;
 use App\Models\StatusPesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class KeuanganController extends Controller
 {
-    public function hutang_piutang()
+    public function laporan_keuangan()
     {
-        $title = "hutang & piutang";
+        $title = "laporan keuangan";
         $getData = DataEkspedisi::latest()->get();
 
         $dataTambah = array();
@@ -41,7 +42,7 @@ class KeuanganController extends Controller
 
         $data = PembayaranPelanggan::latest()->get();
 
-        return view('back.pages.keuangan.hutang-piutang', compact("title", "dataTambah", "data"));
+        return view('back.pages.keuangan.laporan-keuangan', compact("title", "dataTambah", "data"));
     }
 
     public function simpan_pembayaran_ekspedisi(Request $request)
@@ -49,29 +50,13 @@ class KeuanganController extends Controller
         DB::beginTransaction();
 
         try {
-            $data = PembayaranPelanggan::where('data_ekspedisi_id', $request->id)->first();
-            if (!empty($data)) {
-                throw new \Exception("Data pembayaran dengan no awp tersebut sudah pernah ditambahkan");
-            }
-
             $data = PembayaranPelanggan::create([
                 "data_ekspedisi_id" => $request->id,
-                "status" => "process"
+                "status" => $request->status
             ]);
 
             if (!$data->save()) {
                 throw new \Exception("Terjadi kesalahan saat menyimpan data, silahkan coba lagi");
-            }
-
-            $statusPesanan = StatusPesanan::create([
-                "data_ekspedisi_id" => $request->id,
-                "waktu" => date('Y-m-d H:i:s'),
-                "note" => "Menunggu Pembayaran Pelanggan",
-                "status" => "process"
-            ]);
-
-            if (!$statusPesanan->save()) {
-                throw new \Exception("Terjadi kesalahan saat menyimpan status, silahkan coba lagi");
             }
 
             DB::commit();
@@ -103,14 +88,6 @@ class KeuanganController extends Controller
                 throw new \Exception("Terjadi kesalahan saat menghapus data pembayaran, silahkan coba lagi");
             }
 
-            $statusPesanan = StatusPesanan::where('data_ekspedisi_id', $data_ekspedisi_id)
-            ->where('note', 'Menunggu Pembayaran Pelanggan')
-            ->first();
-
-            if (!$statusPesanan->delete()) {
-                throw new \Exception("Terjadi kesalahan saat menghapus status pesanan, silahkan coba lagi");
-            }
-
             DB::commit();
 
             return redirect()->back()->with("success", "Berhasil menghapus data pembayaran pelanggan");
@@ -119,5 +96,26 @@ class KeuanganController extends Controller
             DB::rollBack();
             return redirect()->back()->withErrors($th->getMessage());
         }
+    }
+
+    public function cetak_laporan_keuangan()
+    {
+        $pembayaran = PembayaranPelanggan::where('status', 'lunas')->latest()->get();
+        $pendapatan = 0;
+        $pesanan = 0;
+
+        foreach ($pembayaran as $key => $value) {
+            $pendapatan += $value->data_ekspedisi->biaya;
+            $pesanan ++;
+        }
+
+        $data = [
+            "pendapatan" => $pendapatan,
+            "pesanan" => $pesanan,
+            "data" => $pembayaran
+        ];
+
+        $pdf = PDF::loadview('back.pages.keuangan.laporan', ['data' => $data]);
+        return $pdf->stream('laporan-keuangan');
     }
 }

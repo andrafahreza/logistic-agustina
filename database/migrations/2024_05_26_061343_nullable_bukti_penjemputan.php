@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pengguna', function (Blueprint $table) {
-            $table->dropColumn('name');
+        Schema::table('penjemputan', function (Blueprint $table) {
+            $table->string('bukti_penjemputan')->nullable()->change();
         });
     }
 

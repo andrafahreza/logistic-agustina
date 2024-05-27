@@ -10,25 +10,25 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "pelanggan")
+        @if (auth()->user()->level->nama_level == "operator" || auth()->user()->level->nama_level == "keuangan" || auth()->user()->level->nama_level == "kepala_perusahaan")
             <li class="nav-item">
                 <a class="nav-link @if ($title != 'request pengiriman' && $title != 'pengelola pengiriman' && $title != 'daftar pesanan') collapsed @endif" data-bs-target="#pengiriman" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-truck"></i><span>Pengiriman</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="pengiriman" class="nav-content collapse @if ($title == 'request pengiriman' || $title == 'pengelola pengiriman' || $title == 'daftar pesanan') show @endif" data-bs-parent="#sidebar-nav">
-                    @if (auth()->user()->level->nama_level == "pelanggan")
-                        <li>
-                            <a href="{{ route('request-pengiriman') }}" @if ($title == 'request pengiriman') class="active" @endif>
-                                <i class="bi bi-circle"></i><span>Request Pengiriman Barang</span>
-                            </a>
-                        </li>
+                <ul id="pengiriman" class="nav-content collapse @if ($title == 'request pengiriman' || $title == 'pengelola pengiriman' || $title == 'daftar pesanan' || $title == 'pengelola penjemputan') show @endif" data-bs-parent="#sidebar-nav">
+                    @if (auth()->user()->level->nama_level == "keuangan" || auth()->user()->level->nama_level == "kepala_perusahaan")
                         <li>
                             <a href="{{ route('daftar-pesanan') }}" @if ($title == 'daftar pesanan') class="active" @endif>
                                 <i class="bi bi-circle"></i><span>Daftar Pesanan</span>
                             </a>
                         </li>
                     @endif
-                    @if (auth()->user()->level->nama_level == "operasional")
+                    @if (auth()->user()->level->nama_level == "operator")
+                        <li>
+                            <a href="{{ route('pengelola-penjemputan') }}" @if ($title == 'pengelola penjemputan') class="active" @endif>
+                                <i class="bi bi-circle"></i><span>Pengelola Penjemputan Barang</span>
+                            </a>
+                        </li>
                         <li>
                             <a href="{{ route('pengelola-pengiriman') }}" @if ($title == 'pengelola pengiriman') class="active" @endif>
                                 <i class="bi bi-circle"></i><span>Pengelola Pengiriman Barang</span>
@@ -39,16 +39,7 @@
             </li>
         @endif
 
-        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
-            <li class="nav-item">
-                <a class="nav-link @if ($title === 'verifikasi') active @else collapsed @endif" href="{{ route('verifikasi') }}">
-                    <i class="bi bi-person-check-fill"></i>
-                    <span>Verifikasi pelanggan</span>
-                </a>
-            </li>
-        @endif
-
-        @if (auth()->user()->level->nama_level == "operasional" || auth()->user()->level->nama_level == "admin")
+        @if (auth()->user()->level->nama_level == "admin" || auth()->user()->level->nama_level == "kepala_perusahaan")
             <li class="nav-item">
                 <a class="nav-link @if ($title != 'vendor' && $title != "operator" && $title != "kepala perusahaan" && $title != "admin" || $title == 'users' || $title == 'keuangan') collapsed @endif" data-bs-target="#pengguna" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-person"></i><span>Employeed</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -74,48 +65,47 @@
                             <i class="bi bi-circle"></i><span>Keuangan</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('vendor') }}" @if ($title == 'vendor') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Vendor</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('users') }}" @if ($title == 'users') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Users</span>
-                        </a>
-                    </li>
                 </ul>
             </li>
+        @endif
 
+        @if (auth()->user()->level->nama_level != "kepala_perusahaan")
             <li class="nav-item">
-                <a class="nav-link @if ($title != 'biaya' && $title != 'kendaraan' && $title != 'supir') collapsed @endif" data-bs-target="#pesanan" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-archive-fill"></i><span>Pesanan</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link @if ($title != 'biaya' && $title != 'cabang' && $title != 'supir') collapsed @endif" data-bs-target="#pesanan" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-archive-fill"></i><span>Master Data</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="pesanan" class="nav-content collapse @if ($title == 'biaya' || $title == 'kendaraan' || $title == 'supir') show @endif" data-bs-parent="#sidebar-nav">
+                <ul id="pesanan" class="nav-content collapse @if ($title == 'biaya' || $title == 'cabang' || $title == 'supir') show @endif" data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="{{ route('biaya') }}" @if ($title == 'biaya') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Biaya Pengiriman</span>
-                        </a>
-                        <a href="{{ route('kendaraan') }}" @if ($title == 'kendaraan') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Kendaraan</span>
-                        </a>
-                        <a href="{{ route('supir') }}" @if ($title == 'supir') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Supir</span>
-                        </a>
+                        @if (auth()->user()->level->nama_level == "admin" || auth()->user()->level->nama_level == "keuangan")
+                            @if (auth()->user()->level->nama_level == "admin")
+                                <a href="{{ route('cabang') }}" @if ($title == 'cabang') class="active" @endif>
+                                    <i class="bi bi-circle"></i><span>Cabang</span>
+                                </a>
+                            @endif
+                            <a href="{{ route('biaya') }}" @if ($title == 'biaya') class="active" @endif>
+                                <i class="bi bi-circle"></i><span>Biaya Pengiriman</span>
+                            </a>
+                        @endif
+
+                        @if (auth()->user()->level->nama_level != "keuangan")
+                            <a href="{{ route('supir') }}" @if ($title == 'supir') class="active" @endif>
+                                <i class="bi bi-circle"></i><span>Supir</span>
+                            </a>
+                        @endif
                     </li>
                 </ul>
             </li>
         @endif
 
-        @if (auth()->user()->level->nama_level == 'keuangan')
+        @if (auth()->user()->level->nama_level == 'keuangan' || auth()->user()->level->nama_level == "kepala_perusahaan")
             <li class="nav-item">
                 <a class="nav-link @if ($title != 'hutang & piutang') collapsed @endif" data-bs-target="#keuangan" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-cash"></i><span>Keuangan</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="keuangan" class="nav-content collapse @if ($title == 'hutang & piutang') show @endif" data-bs-parent="#sidebar-nav">
+                <ul id="keuangan" class="nav-content collapse @if ($title == 'laporan keuangan') show @endif" data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="{{ route('hutang-piutang') }}" @if ($title == 'hutang & piutang') class="active" @endif>
-                            <i class="bi bi-circle"></i><span>Hutang & Piutang</span>
+                        <a href="{{ route('laporan-keuangan') }}" @if ($title == 'laporan keuangan') class="active" @endif>
+                            <i class="bi bi-circle"></i><span>Laporan Keuangan</span>
                         </a>
                     </li>
                 </ul>

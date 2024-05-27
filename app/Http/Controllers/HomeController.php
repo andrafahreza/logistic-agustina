@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataEkspedisi;
 use App\Models\Pelanggan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,11 +12,10 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
         $title = "home";
-        $pelanggan = Pelanggan::get()->count();
-        $nonActive = User::where('status', 'non_active')->get()->count();
+        $user = Auth::user();
+        $pesanan = DataEkspedisi::get();
 
-        return view('back.pages.home', compact('title', 'pelanggan', 'nonActive', 'user'));
+        return view('back.pages.home', compact('title', 'pesanan', 'user'));
     }
 }

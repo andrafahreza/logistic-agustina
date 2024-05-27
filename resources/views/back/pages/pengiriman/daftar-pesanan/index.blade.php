@@ -35,9 +35,9 @@
                             <thead>
                                 <tr>
                                     <th>#ID</th>
-                                    <th>No Awb</th>
+                                    <th>No Resi</th>
                                     <th>Nama Barang</th>
-                                    <th>File Pengiriman</th>
+                                    <th>Note</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -50,23 +50,20 @@
 
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->no_awb }} <br> <a href="{{ asset('images-awb/'.$item->file_awb) }}">Lihat File</a></td>
+                                        <td>{{ $item->no_resi }}</td>
                                         <td>{{ $item->nama_barang }}</td>
-                                        <td><a href="{{ asset("images/".$item->file_surat_pengiriman) }}" target="_blank">Lihat File</a></td>
+                                        <td>{{ $item->note }}</td>
                                         <td>
                                             @if (empty($status))
-                                                <span class="badge bg-warning">Menunggu Antrian</span>
+                                                <span class="badge bg-warning">Menunggu Pengiriman</span>
                                             @else
                                                 @if ($status->status == "process")
                                                     <span class="badge bg-warning">Proses</span>
                                                     <br>
                                                     <span>Note: {{ $status->note }}</span>
                                                 @elseif ($status->status == "denied")
-                                                    <span class="badge bg-danger">Ditolak</span>
+                                                    <span class="badge bg-danger">Dibatalkan</span>
                                                     <br>
-                                                    <span>Note: {{ $status->note }}</span>
-                                                @elseif ($status->status == "accept")
-                                                    <span class="badge bg-warning">Diterima</span> <br>
                                                     <span>Note: {{ $status->note }}</span>
                                                 @else
                                                     <span class="badge bg-success">Selesai</span>
@@ -103,7 +100,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <span><b>Status : </b></span> <span id="status">Menunggu Antrian</span> <br>
-                            <span><b>No Awb : </b></span> <span id="no_awb">-</span> <br>
+                            <span><b>No Resi : </b></span> <span id="no_resi">-</span> <br>
                             <span><b>Biaya : </b></span> <span id="biaya">-</span>
                         </div>
                     </div>
@@ -131,7 +128,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4 mt-4">
-                            <span><b>Kendaraan : </b> </span> <span id="kendaraan">-</span>
+                            <span><b>Cabang : </b> </span> <span id="cabang">-</span>
                         </div>
                         <div class="col-md-4 mt-4">
                             <span><b>Supir : </b></span> <span id="supir"></span>
@@ -141,14 +138,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mt-4">
-                            <span><b>Provinsi : </b> </span> <span id="provinsi">-</span>
-                        </div>
-                        <div class="col-md-4 mt-4">
-                            <span><b>Kecamatan : </b></span> <span id="kecamatan"></span>
-                        </div>
-                        <div class="col-md-4 mt-4">
-                            <span><b>Kelurahan : </b></span> <span id="kelurahan"></span>
+                        <div class="col-md-12 mt-4">
+                            <br>
+                            <table class="table table-striped text-center" id="statusPesanan">
+                                <thead>
+                                    <th>Waktu</th>
+                                    <th>Keterangan</th>
+                                    <th>Status</th>
+                                </thead>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -179,7 +177,7 @@
                         const data = response.data;
                         console.log(data);
                         $('#status').text(data.status);
-                        $('#no_awb').text(data.no_awb);
+                        $('#no_resi').text(data.no_resi);
                         $('#biaya').text(data.biaya);
                         $('#nama_barang').text(data.nama_barang);
                         $('#jumlah_barang').text(data.jumlah_barang);
@@ -187,12 +185,12 @@
                         $('#nama_penerima').text(data.nama_penerima);
                         $('#alamat_asal').text(data.alamat_asal);
                         $('#alamat_penerima').text(data.alamat_penerima);
-                        $('#kendaraan').text(data.kendaraan);
                         $('#supir').text(data.supir);
                         $('#note').text(data.note);
-                        $('#provinsi').text(data.provinsi);
-                        $('#kecamatan').text(data.kecamatan);
-                        $('#kelurahan').text(data.kelurahan);
+                        $('#cabang').text(data.cabang);
+
+                        $('#statusPesanan tbody').empty();
+                        $('#statusPesanan').append(data.htmlStatus);
                     } else {
                         $('#detail').modal('toggle');
                         $('#error-message').removeClass('d-none');

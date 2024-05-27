@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('pengguna', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
             $table->string('nama');
@@ -22,8 +21,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('no_telepon');
             $table->enum('status', ['active', 'non_active']);
-            // $table->timestamp('email_verified_at')->nullable();
-            // $table->rememberToken();
             $table->timestamps();
         });
     }

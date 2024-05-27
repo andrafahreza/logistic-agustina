@@ -11,63 +11,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function verifikasi()
-    {
-        $title = "verifikasi";
-        $level = Level::where('nama_level', 'pelanggan')->first();
-        if (empty($level)) {
-            abort(404);
-        }
-
-        $data = User::where('status', 'non_active')
-        ->where('level_id', $level->id)
-        ->latest()
-        ->get();
-
-        return view('back.pages.user.verifikasi', compact('title', 'data'));
-    }
-
-    public function verifikasi_pelanggan(Request $request)
-    {
-        DB::beginTransaction();
-
-        try {
-            $data = User::find($request->id);
-            if (empty($data)) {
-                throw new \Exception("Pelanggan tidak ditemukan");
-            }
-
-            $data->status = "active";
-
-            if (!$data->update()) {
-                throw new \Exception("Gagal memverifikasi pelanggan, silahkan coba lagi");
-            }
-
-            DB::commit();
-
-            return redirect()->back()->with('success', "Berhasil memverifikasi pelanggan");
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return redirect()->back()->withErrors($th->getMessage());
-        }
-    }
-
-    public function users()
-    {
-        $title = "users";
-        $level = Level::where('nama_level', 'pelanggan')->first();
-        if (empty($level)) {
-            abort(404);
-        }
-
-        $data = User::whereNot("id", Auth::user()->id)
-        ->where('level_id', $level->id)
-        ->latest()
-        ->get();
-
-        return view('back.pages.user.pelanggan', compact(['title', 'data']));
-    }
-
     public function nonactive_user(Request $request)
     {
         DB::beginTransaction();
@@ -658,6 +601,45 @@ class UserController extends Controller
             DB::commit();
 
             return redirect()->route('kepala')->with('success', "Berhasil menghapus data");
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    // Ganti Password
+    public function ganti_password()
+    {
+        $title = "ganti password";
+
+        return view('back.pages.user.ganti-password', compact('title'));
+    }
+
+    public function action_ganti_password(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+            $checkOldPassword = Hash::check($request->old_password, $user->password);
+            if (!$checkOldPassword) {
+                throw new \Exception("Password lama salah");
+            }
+
+            if ($request->new_password != $request->konfirmasi_password) {
+                throw new \Exception("Password baru dan konfirmasi password harus sama");
+            }
+
+            $user->password = Hash::make($request->new_password);
+
+            if (!$user->update()) {
+                throw new \Exception("Terjadi kesalahan saat memperbarui password");
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with("success", "Berhasil memperbarui password");
+
         } catch (\Throwable $th) {
             DB::rollBack();
             return redirect()->back()->withErrors($th->getMessage());

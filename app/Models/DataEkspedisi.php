@@ -12,10 +12,11 @@ class DataEkspedisi extends Model
     protected $table    = 'data_ekspedisi';
     protected $fillable = [
         'id',
-        'kendaraan_id',
         'supir_id',
-        'district_id',
-        'no_awb',
+        'penjemputan_id',
+        'cabang_id',
+        'no_resi',
+        'nama_asal',
         'nama_penerima',
         'alamat_asal',
         'alamat_penerima',
@@ -24,14 +25,8 @@ class DataEkspedisi extends Model
         'volume',
         'note',
         'biaya',
-        'file_surat_pengiriman',
-        'file_awb',
         'created_by',
     ];
-
-    public function kendaraan(){
-        return $this->belongsTo(Kendaraan::class, "kendaraan_id");
-    }
 
     public function supir(){
         return $this->belongsTo(Supir::class, "supir_id");
@@ -41,15 +36,19 @@ class DataEkspedisi extends Model
         return $this->belongsTo(User::class, "created_by");
     }
 
+    public function penjemputan(){
+        return $this->belongsTo(Penjemputan::class, "penjemputan_id");
+    }
+
+    public function cabang(){
+        return $this->belongsTo(Penjemputan::class, "penjemputan_id");
+    }
+
     public function status(){
-        return $this->hasMany(StatusPesanan::class, "data_ekspedisi_id");
+        return $this->hasMany(StatusPesanan::class, "data_ekspedisi_id", "id");
     }
 
     public function pembayaran_pelanggan(){
-        return $this->hasMany(PembayaranPelanggan::class, "data_ekspedisi_id");
-    }
-
-    public function pembayaran_vendor(){
-        return $this->hasMany(PembayaranVendor::class, "data_ekspedisi_id");
+        return $this->hasMany(PembayaranPelanggan::class, "data_ekspedisi_id", "id");
     }
 }

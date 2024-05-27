@@ -17,7 +17,9 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#tambah" id="btnTambah">+ Tambah</button> <br><br>
+                        <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#tambah" id="btnTambah">+ Tambah</button>
+                        <a class="btn btn-success mt-4" href="{{ route('cetak-laporan-keuangan') }}" target="_blank">Cetak Laporan</a>
+                        <br><br>
                         @if ($errors->any())
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <strong>Error!</strong>  {{ $errors->first() }}
@@ -37,8 +39,8 @@
                                 <tr>
                                     <th>#ID</th>
                                     <th>#ID Data Ekspedisi</th>
+                                    <th>No Resi</th>
                                     <th>Nama Barang</th>
-                                    <th>File Pengiriman</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -52,10 +54,10 @@
                                     <tr>
                                         <td>{{ $item->id }}</td>
                                         <td>{{ $item->data_ekspedisi_id }}</td>
+                                        <td>{{ $item->data_ekspedisi->no_resi }}</td>
                                         <td>{{ $item->data_ekspedisi->nama_barang }}</td>
-                                        <td><a href="{{ asset("images/".$item->data_ekspedisi->file_surat_pengiriman) }}" target="_blank">Lihat File</a></td>
                                         <td>
-                                            @if ($item->status == "process")
+                                            @if ($item->status == "belum_bayar")
                                                 <span class="badge bg-warning">Belum Dibayar</span>
                                             @else
                                                 <span class="badge bg-success">Lunas</span>
@@ -64,7 +66,7 @@
                                         <td>
                                             <button type="button" class="btn btn-secondary" onclick="detail({{ $item->data_ekspedisi->id }})">Detail</button>
 
-                                            @if ($item->status == "process")
+                                            @if ($item->status == "belum_bayar")
                                                 <button type="button" class="btn btn-danger" onclick="hapus({{ $item->id }})">Hapus</button>
                                             @endif
                                         </td>
@@ -102,8 +104,16 @@
                                 <select class="form-control" name="id" required>
                                     <option value="">Pilih Data Ekspedisi</option>
                                     @foreach ($dataTambah as $item)
-                                        <option value="{{ $item->id }}">No AWB: {{ $item->no_awb }}</option>
+                                        <option value="{{ $item->id }}">No Resi: {{ $item->no_resi }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 mt-4">
+                                <label>Status</label>
+                                <select class="form-control" name="status" required>
+                                    <option value="">Pilih Status</option>
+                                    <option value="belum_bayar">Belum Bayar</option>
+                                    <option value="lunas">Lunas</option>
                                 </select>
                             </div>
                         </div>
@@ -134,7 +144,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <span><b>Status : </b></span> <span id="status">Menunggu Antrian</span> <br>
-                            <span><b>No Awb : </b></span> <span id="no_awb">-</span> <br>
+                            <span><b>No Resi : </b></span> <span id="no_resi">-</span> <br>
                             <span><b>Biaya : </b></span> <span id="biaya">-</span>
                         </div>
                     </div>
@@ -162,7 +172,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4 mt-4">
-                            <span><b>Kendaraan : </b> </span> <span id="kendaraan">-</span>
+                            <span><b>Cabang : </b> </span> <span id="cabang">-</span>
                         </div>
                         <div class="col-md-4 mt-4">
                             <span><b>Supir : </b></span> <span id="supir"></span>
@@ -172,14 +182,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mt-4">
-                            <span><b>Provinsi : </b> </span> <span id="provinsi">-</span>
-                        </div>
-                        <div class="col-md-4 mt-4">
-                            <span><b>Kecamatan : </b></span> <span id="kecamatan"></span>
-                        </div>
-                        <div class="col-md-4 mt-4">
-                            <span><b>Kelurahan : </b></span> <span id="kelurahan"></span>
+                        <div class="col-md-12 mt-4">
+                            <br>
+                            <table class="table table-striped text-center" id="statusPesanan">
+                                <thead>
+                                    <th>Waktu</th>
+                                    <th>Keterangan</th>
+                                    <th>Status</th>
+                                </thead>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -232,7 +243,7 @@
                         const data = response.data;
                         console.log(data);
                         $('#status').text(data.status);
-                        $('#no_awb').text(data.no_awb);
+                        $('#no_resi').text(data.no_resi);
                         $('#biaya').text(data.biaya);
                         $('#nama_barang').text(data.nama_barang);
                         $('#jumlah_barang').text(data.jumlah_barang);
@@ -240,12 +251,12 @@
                         $('#nama_penerima').text(data.nama_penerima);
                         $('#alamat_asal').text(data.alamat_asal);
                         $('#alamat_penerima').text(data.alamat_penerima);
-                        $('#kendaraan').text(data.kendaraan);
                         $('#supir').text(data.supir);
                         $('#note').text(data.note);
-                        $('#provinsi').text(data.provinsi);
-                        $('#kecamatan').text(data.kecamatan);
-                        $('#kelurahan').text(data.kelurahan);
+                        $('#cabang').text(data.cabang);
+
+                        $('#statusPesanan tbody').empty();
+                        $('#statusPesanan').append(data.htmlStatus);
                     } else {
                         $('#detail').modal('toggle');
                         $('#error-message').removeClass('d-none');

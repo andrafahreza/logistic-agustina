@@ -20,8 +20,6 @@ class User extends Authenticatable
     protected $table    = 'pengguna';
     protected $fillable = [
         'level_id',
-        'pelanggan_id',
-        'vendor_id',
         'username',
         'password',
         'nama',
@@ -52,13 +50,5 @@ class User extends Authenticatable
 
     public function level(){
         return $this->belongsTo(Level::class, "level_id");
-    }
-
-    public function pelanggan(){
-        return $this->belongsTo(Pelanggan::class, "pelanggan_id");
-    }
-
-    public function vendor(){
-        return $this->belongsTo(Vendor::class, "vendor_id");
     }
 }

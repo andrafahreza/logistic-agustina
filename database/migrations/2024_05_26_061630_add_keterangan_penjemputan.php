@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('data_ekspedisi', function (Blueprint $table) {
-            $table->string('no_awb')->nullable()->change();
+        Schema::table('penjemputan', function (Blueprint $table) {
+            $table->text('keterangan')->nullable();
         });
     }
 

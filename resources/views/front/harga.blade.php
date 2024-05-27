@@ -31,18 +31,28 @@
                     <div class="col-lg-12">
                         <h3 class="text-center">Cari Tahu Biaya Pengiriman Disini</h3>
                         <div class="row mt-2">
-                            <div class="col-md-4 form-group">
-                                <input type="text" name="name" class="form-control" id="name"
-                                    placeholder="Your Name" required>
-                            </div>
-                            <div class="col-md-4 form-group mt-3 mt-md-0">
-                                <input type="email" class="form-control" name="email" id="email"
-                                    placeholder="Your Email" required>
-                            </div>
-                            <div class="col-md-4 form-group mt-3 mt-md-0">
-                                <input type="email" class="form-control" name="email" id="email"
-                                    placeholder="Your Email" required>
-                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tujuan</th>
+                                        <th>Biaya</th>
+                                        <th>Service</th>
+                                        <th>Minimal Berat</th>
+                                        <th>Jangka waktu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($data as $item)
+                                        <tr>
+                                            <td>{{ $item->cabang->nama_cabang }}</td>
+                                            <td>Rp. {{ number_format($item->biaya) }}</td>
+                                            <td>{{ $item->service }}</td>
+                                            <td>{{ $item->minimal_berat }}</td>
+                                            <td>{{ $item->jangka_waktu }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div><!-- End Contact Form -->
 

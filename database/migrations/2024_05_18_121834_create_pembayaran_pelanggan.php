@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pembayaran_vendor', function (Blueprint $table) {
+        Schema::create('pembayaran_pelanggan', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('data_ekspedisi_id');
+            $table->enum('status', ['lunas', 'belum_bayar', 'gagal']);
+            $table->timestamps();
 
             $table->foreign("data_ekspedisi_id")->references("id")->on("data_ekspedisi");
         });
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('pembayaran_pelanggan');
     }
 };

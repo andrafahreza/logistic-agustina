@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayaran_vendor', function (Blueprint $table) {
+        Schema::create('level', function (Blueprint $table) {
             $table->id();
-            $table->string('bukti');
-            $table->enum('status', ['process', 'done']);
+            $table->string('nama_level');
             $table->timestamps();
+        });
+
+        Schema::table('pengguna', function (Blueprint $table) {
+            $table->unsignedBigInteger('level_id')->after('id');
+
+            $table->foreign("level_id")->references("id")->on("level");
         });
     }
 
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayaran_vendor');
+        Schema::dropIfExists('level');
     }
 };

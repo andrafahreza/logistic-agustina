@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('status_pesanan', function (Blueprint $table) {
+        Schema::create('cabang', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('data_ekspedisi_id');
-            $table->dateTime('waktu');
-            $table->text('note');
-            $table->string('status');
+            $table->string('nama_cabang');
             $table->timestamps();
-
-            $table->foreign("data_ekspedisi_id")->references("id")->on("data_ekspedisi");
         });
     }
 
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('status_pesanan');
+        Schema::dropIfExists('cabang');
     }
 };

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Biaya;
+use App\Models\Cabang;
 use App\Models\DataEkspedisi;
 use App\Models\Districts;
+use App\Models\Penjemputan;
 use App\Models\Provinces;
 use App\Models\Regencies;
 use App\Models\StatusPesanan;
@@ -50,26 +52,41 @@ class PengirimanController extends Controller
         if (!empty($data)) {
             $status = StatusPesanan::where('data_ekspedisi_id', $id)->latest()->first();
             if (empty($status)) {
-                $status = "Menunggu Antrian";
+                $status = "Menunggu Pengiriman";
             } else {
                 if ($status->status == "process") {
                     $status = "Proses";
                 } else if ($status->status == "denied") {
-                    $status = "Ditolak";
-                } else if ($status->status == "accept") {
-                    $status = "Diterima";
-                } else {
+                    $status = "Dibatalkan";
+                }  else {
                     $status = "Selesai";
                 }
             }
 
-            $kelurahan = Districts::find($data->district_id);
-            $kecamatan = Regencies::find($kelurahan->regency_id);
-            $provinsi = Provinces::find($kecamatan->province_id);
+            $cabang = Cabang::find($data->cabang_id);
+            $statusPesanan = StatusPesanan::where('data_ekspedisi_id', $id)->latest()->get();
+            $htmlStatus = "<tbody>";
+            foreach ($statusPesanan as $key => $value) {
+                $tgl = date('d-m-Y H:i', strtotime($value->waktu));
+                if ($value->status == "process") {
+                    $getStatus = "Proses";
+                } else if ($value->status == "denied") {
+                    $getStatus = "Dibatalkan";
+                } else {
+                    $getStatus = "Selesai";
+                }
+
+                $htmlStatus .= "<tr>
+                    <td>$tgl</td>
+                    <td>$value->note</td>
+                    <td>$getStatus</td>
+                </tr>";
+            }
+            $htmlStatus .= "</tbody>";
 
             $data = [
                 "status" => $status,
-                "no_awb" => $data->no_awb != null ? $data->no_awb : "-",
+                "no_resi" => $data->no_resi,
                 "biaya" => "Rp. ".number_format($data->biaya),
                 "nama_barang" => $data->nama_barang,
                 "jumlah_barang" => $data->jumlah_barang,
@@ -77,12 +94,10 @@ class PengirimanController extends Controller
                 "nama_penerima" => $data->nama_penerima,
                 "alamat_asal" => $data->alamat_asal,
                 "alamat_penerima" => $data->alamat_penerima,
-                "kendaraan" => $data->kendaraan_id != null ? $data->kendaraan->no_kendaraan : "-",
                 "supir" => $data->supir_id != null ? $data->supir->nama : "-",
                 "note" => $data->note,
-                "provinsi" => $provinsi->name,
-                "kecamatan" => $kecamatan->name,
-                "kelurahan" => $kelurahan->name
+                "cabang" => $cabang->nama_cabang,
+                "htmlStatus" => $htmlStatus
             ];
 
             $data = [
@@ -101,11 +116,13 @@ class PengirimanController extends Controller
 
     public function tambah_request_pengiriman($id = null)
     {
-        $title = 'request pengiriman';
+        $title = 'pengelola pengiriman';
         $data = DataEkspedisi::find($id);
-        $province = Provinces::get();
+        $cabang = Cabang::get();
+        $penjemputan = Penjemputan::where('status', 'proses')->latest()->get();
+        $supir = Supir::get();
 
-        return view('back.pages.pengiriman.request-pengiriman.tambah-request-pengiriman', compact('title', 'data', "id", "province"));
+        return view('back.pages.pengiriman.request-pengiriman.tambah-request-pengiriman', compact('title', 'data', "id", "cabang", "penjemputan", "supir"));
     }
 
     public function simpan_request_pengiriman(Request $request)
@@ -114,24 +131,26 @@ class PengirimanController extends Controller
 
         try {
             $data = DataEkspedisi::find($request->id);
+            $request->biaya = str_replace("Rp. ", "", $request->biaya);
+            $request->biaya = str_replace(".", "", $request->biaya);
+            $request->biaya = str_replace(",", "", $request->biaya);
 
-            $validation = Validator::make($request->all(), [
-                "file_surat" => "required|mimes:pdf"
-            ]);
+            if ($request->penjemputan_id) {
+                $penjemputan = Penjemputan::find($request->penjemputan_id);
+                $penjemputan->status = "berhasil";
 
-            if ($validation->fails()) {
-                throw new \Exception("Data upload harus pdf");
+                if (!$penjemputan->update()) {
+                    throw new \Exception("Gagal memperbarui penjemputan");
+                }
             }
-
-            $destinationPath = 'images';
-            $file = Uuid::uuid4()->getHex().$request->file_surat->getClientOriginalName();
-            $request->file_surat->move(public_path($destinationPath), $file);
-
-            $cekBiaya = Biaya::where('district_id', $request->district_id)->first();
 
             if (empty($data)) {
                 $data = DataEkspedisi::create([
-                    "district_id" => $request->district_id,
+                    "supir_id" => $request->supir_id,
+                    "penjemputan_id" => $request->penjemputan_id,
+                    "cabang_id" => $request->cabang,
+                    "no_resi" => $request->no_resi,
+                    "nama_asal" => $request->nama_pengirim,
                     "nama_penerima" => $request->nama_penerima,
                     "alamat_asal" => $request->alamat_asal,
                     "alamat_penerima" => $request->alamat_penerima,
@@ -139,8 +158,7 @@ class PengirimanController extends Controller
                     "jumlah_barang" => $request->jumlah_barang,
                     "volume" => $request->volume,
                     "note" => $request->note,
-                    "biaya" => $cekBiaya->biaya,
-                    "file_surat_pengiriman" => $file,
+                    "biaya" => (int)$request->biaya,
                     "created_by" => Auth::user()->id
                 ]);
 
@@ -148,15 +166,19 @@ class PengirimanController extends Controller
                     throw new \Exception("Terjadi kesalahan saat menyimpan, silahkan coba lagi");
                 }
             } else {
-                $data->district_id = $request->district_id;
+                $data->supir_id = $request->supir_id;
+                $data->penjemputan_id = $request->penjemputan_id;
+                $data->cabang_id = $request->cabang_id;
+                $data->no_resi = $request->no_resi;
+                $data->nama_asal = $request->nama_pengirim;
                 $data->nama_penerima = $request->nama_penerima;
                 $data->alamat_asal = $request->alamat_asal;
                 $data->alamat_penerima = $request->alamat_penerima;
                 $data->nama_barang = $request->nama_barang;
+                $data->jumlah_barang = $request->jumlah_barang;
                 $data->volume = $request->volume;
                 $data->note = $request->note;
-                $data->biaya = $cekBiaya->biaya;
-                $data->file_surat_pengiriman = $file;
+                $data->biaya = $request->biaya;
 
                 if (!$data->update()) {
                     throw new \Exception("Terjadi kesalahan saat menyimpan, silahkan coba lagi");
@@ -165,8 +187,33 @@ class PengirimanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('request-pengiriman')->with('success', 'Berhasil melakukan request pengiriman');
+            return redirect()->route('pengelola-pengiriman')->with('success', 'Berhasil melakukan request pengiriman');
 
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function update_pesanan(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = StatusPesanan::create([
+                "data_ekspedisi_id" => $request->data_ekspedisi_id,
+                "waktu" => date('Y-m-d H:i:s'),
+                "note" => $request->note,
+                "status" => $request->status
+            ]);
+
+            if (!$data->save()) {
+                throw new \Exception("Terjadi kesalahan dalam menyimpan data");
+            }
+
+            DB::commit();
+
+            return redirect()->route('pengelola-pengiriman')->with('success', 'Berhasil memperbarui status pengiriman');
         } catch (\Throwable $th) {
             DB::rollBack();
             return redirect()->back()->withErrors($th->getMessage());
@@ -198,57 +245,11 @@ class PengirimanController extends Controller
         }
     }
 
-    public function tolak_request_pengiriman(Request $request)
-    {
-        DB::beginTransaction();
-
-        try {
-            $data = DataEkspedisi::find($request->id);
-            $status = StatusPesanan::create([
-                "data_ekspedisi_id" => $data->id,
-                "waktu" => date('Y-m-d H:i:s'),
-                "note" => $request->note,
-                "status" => "denied"
-            ]);
-
-            if (!$status->save()) {
-                throw new \Exception("Terjadi kesalahan penolakan data");
-            }
-
-            DB::commit();
-
-            return redirect()->back()->with("success", "Berhasil menghapus data");
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return redirect()->back()->withErrors($th->getMessage());
-        }
-    }
-
     // Daftar Pemesanan
     public function daftar_pesanan()
     {
         $title = "daftar pesanan";
-        $getData = DataEkspedisi::where('created_by', Auth::user()->id)->latest()->get();
-
-        $data = array();
-        foreach ($getData as $key => $value) {
-            if ($value->status->count() < 0) {
-                continue;
-            }
-
-            $statusDenied = false;
-            foreach ($value->status as $kunci => $isi) {
-                if ($isi->status == "denied") {
-                    $statusDenied = true;
-                }
-            }
-
-            if ($statusDenied) {
-                continue;
-            }
-
-            $data[] = $value;
-        }
+        $data = DataEkspedisi::latest()->get();
 
         return view('back.pages.pengiriman.daftar-pesanan.index', compact('title', 'data'));
     }
@@ -257,80 +258,9 @@ class PengirimanController extends Controller
     public function pengelola_pengiriman()
     {
         $title = "pengelola pengiriman";
-        $getData = DataEkspedisi::latest()->get();
-
-        $data = array();
-        foreach ($getData as $key => $value) {
-            if ($value->status->count() < 0) {
-                continue;
-            }
-
-            $statusDenied = false;
-            foreach ($value->status as $kunci => $isi) {
-                if ($isi->status == "denied") {
-                    $statusDenied = true;
-                }
-            }
-
-            if ($statusDenied) {
-                continue;
-            }
-
-            $data[] = $value;
-        }
-
-        $vendor = Vendor::get();
+        $data = DataEkspedisi::latest()->get();
         $supir = Supir::get();
 
-        return view('back.pages.pengiriman.request-pengiriman.pengelola-pengiriman', compact('title', 'data', 'vendor', 'supir'));
-    }
-
-    public function terima_request_pengiriman(Request $request)
-    {
-        DB::beginTransaction();
-
-        try {
-            $validation = Validator::make($request->all(), [
-                "file_awb" => "required|mimes:pdf"
-            ]);
-
-            if ($validation->fails()) {
-                throw new \Exception("Data upload harus pdf");
-            }
-
-            $data = DataEkspedisi::find($request->id);
-            $status = StatusPesanan::create([
-                "data_ekspedisi_id" => $data->id,
-                "waktu" => date('Y-m-d H:i:s'),
-                "note" => "Pesanan diterima, sedang diproses terkait pembayaran",
-                "status" => "accept"
-            ]);
-
-            if (!$status->save()) {
-                throw new \Exception("Terjadi kesalahan saat menyimpan status, silahkan coba lagi");
-            }
-
-            $data->kendaraan_id = $request->kendaraan_id;
-            $data->supir_id = $request->supir_id;
-            $data->no_awb = $request->no_awb;
-
-            $destinationPath = 'images-awb';
-            $file = Uuid::uuid4()->getHex().$request->file_awb->getClientOriginalName();
-            $request->file_awb->move(public_path($destinationPath), $file);
-
-            $data->file_awb = $file;
-
-            if (!$data->update()) {
-                throw new \Exception("Terjadi kesalahan saat memperbarui pesanan, silahkan coba lagi");
-            }
-
-            DB::commit();
-
-            return redirect()->back()->with("success", "Berhasil menerima pesanan");
-
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return redirect()->back()->withErrors($th->getMessage());
-        }
+        return view('back.pages.pengiriman.request-pengiriman.pengelola-pengiriman', compact('title', 'data', 'supir'));
     }
 }

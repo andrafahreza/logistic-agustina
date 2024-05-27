@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Biaya;
+use App\Models\DataEkspedisi;
+use App\Models\StatusPesanan;
 use Illuminate\Http\Request;
 
 class PenggunaController extends Controller
@@ -27,13 +30,27 @@ class PenggunaController extends Controller
     public function cekHarga()
     {
         $title = "cek harga";
-        return view('front.harga', compact('title'));
+        $data = Biaya::get();
+
+        return view('front.harga', compact('title', 'data'));
     }
 
-    public function syarat()
+    public function track(Request $request)
     {
-        $title = "syarat";
-        return view('front.syarat', compact('title'));
+        $title = "track";
+        $data = array();
+        $search = false;
+
+        if ($request->isMethod('post')) {
+            $ekspedisi = DataEkspedisi::where('no_resi', $request->no_resi)->first();
+            if (!empty($ekspedisi)) {
+                $data = StatusPesanan::where('data_ekspedisi_id', $ekspedisi->id)->latest()->get();
+            }
+
+            $search = true;
+        }
+
+        return view('front.track', compact('title', 'data', 'search'));
     }
 
     public function kontak()

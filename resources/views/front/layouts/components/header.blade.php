@@ -2,7 +2,7 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
         <a href="index.html" class="logo d-flex align-items-center">
-            <h1>PT. PMH Express</h1>
+            <h1></h1>
         </a>
 
         <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
@@ -13,7 +13,7 @@
                 <li><a href="{{ route('tentang-kami') }}" class="@if ($title == 'tentang kami') active @endif">Tentang Kami</a></li>
                 <li><a href="{{ route('layanan') }}" class="@if ($title == 'layanan') active @endif">Layanan</a></li>
                 <li><a href="{{ route('cek-harga') }}" class="@if ($title == 'cek harga') active @endif">Cek Harga</a></li>
-                <li><a href="{{ route('syarat') }}" class="@if ($title == 'syarat') active @endif">Syarat dan Ketentuan</a></li>
+                <li><a href="{{ route('track') }}" class="@if ($title == 'track') active @endif">Track Pesanan</a></li>
                 <li><a href="{{ route('kontak-kami') }}" class="@if ($title == 'kontak kami') active @endif">Kontak Kami</a></li>
                 <li><a class="get-a-quote" href="{{ route('login') }}">Login</a></li>
             </ul>
